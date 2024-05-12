@@ -4,3 +4,6 @@ scheduler/runtime/rpc_stubs
 # Python.
 *.ipynb_checkpoints
 *.pyc
+
+console_output_*.txt
+scheduler/reproduce
