@@ -20,7 +20,7 @@ psutil
 scipy
 seaborn
 setproctitle
-sklearn
+scikit-learn
 torch
 torchvision
 tqdm
