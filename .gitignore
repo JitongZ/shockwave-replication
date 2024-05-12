@@ -26,3 +26,7 @@ scheduler/traces/search
 *images/monet2photo/*.png
 
 *checkpoints*
+
+console_output_*.txt
+scheduler/reproduce/test_*.txt
+scheduler/reproduce/pickles/*.pickle
