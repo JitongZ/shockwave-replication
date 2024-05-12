@@ -1,5 +1,8 @@
 import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+)
 
 import argparse
 import datetime
@@ -15,6 +18,7 @@ import utils
 
 SLEEP_TIME = 10
 
+
 def main(args):
     # Set up jobs.
     jobs_to_complete = set()
@@ -26,17 +30,19 @@ def main(args):
         for i in range(len(jobs)):
             jobs_to_complete.add(JobIdPair(i, None))
     job_queue = queue.Queue()
-    for (job, arrival_time) in zip(jobs, arrival_times):
+    for job, arrival_time in zip(jobs, arrival_times):
         job_queue.put((job, arrival_time))
 
     # Instantiate scheduler.
     policy = utils.get_policy(args.policy, solver=args.solver, seed=args.seed)
-    sched = scheduler.Scheduler(policy,
-                                seed=args.seed,
-                                throughputs_file=args.throughputs_file,
-                                time_per_iteration=args.time_per_iteration,
-                                expected_num_workers=args.expected_num_workers,
-                                max_rounds=args.max_rounds)
+    sched = scheduler.Scheduler(
+        policy,
+        seed=args.seed,
+        throughputs_file=args.throughputs_file,
+        time_per_iteration=args.time_per_iteration,
+        expected_num_workers=args.expected_num_workers,
+        max_rounds=args.max_rounds,
+    )
 
     try:
         # Submit jobs to the scheduler.
@@ -67,36 +73,67 @@ def main(args):
         if args.timeline_dir is not None:
             sched.save_job_timelines(args.timeline_dir)
         elapsed_time = (datetime.datetime.now() - start_time).seconds
-        print('Total time taken: %d seconds' % (elapsed_time))
+        print("Total time taken: %d seconds" % (elapsed_time))
     except KeyboardInterrupt as e:
         pass
     finally:
         sched.shutdown()
 
-if __name__=='__main__':
-    parser = argparse.ArgumentParser(description='Run scheduler with trace')
-    parser.add_argument('-t', '--trace_file', type=str, required=True,
-                        help='Trace file')
-    parser.add_argument('-p', '--policy', type=str, default='fifo',
-                        choices=utils.get_available_policies(),
-                        help='Scheduler policy')
-    parser.add_argument('--seed', type=int, default=None,
-                        help='Random seed')
-    parser.add_argument('--solver', type=str, choices=['ECOS', 'GUROBI', 'SCS'],
-                        default='ECOS', help='CVXPY solver')
-    parser.add_argument('--throughputs_file', type=str,
-                        default=None,
-                        help='Oracle throughputs file')
-    parser.add_argument('--expected_num_workers', type=int, default=None,
-                        help='Total number of workers expected')
-    parser.add_argument('--time_per_iteration', type=int, default=360,
-                        help='Time per iteration in seconds')
-    parser.add_argument('-s', '--window-start', type=int, default=None,
-                        help='measurement window start (job id)')
-    parser.add_argument('-e', '--window-end', type=int, default=None,
-                        help='Measurement window end (job ID)')
-    parser.add_argument('--max_rounds', type=int, default=None,
-                        help='Maximum number of rounds to run')
-    parser.add_argument('--timeline_dir', type=str, default=None,
-                        help='Directory to save timelnes to')
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run scheduler with trace")
+    parser.add_argument(
+        "-t", "--trace_file", type=str, required=True, help="Trace file"
+    )
+    parser.add_argument(
+        "-p",
+        "--policy",
+        type=str,
+        default="fifo",
+        choices=utils.get_available_policies(),
+        help="Scheduler policy",
+    )
+    parser.add_argument("--seed", type=int, default=None, help="Random seed")
+    parser.add_argument(
+        "--solver",
+        type=str,
+        choices=["ECOS", "GUROBI", "SCS"],
+        default="ECOS",
+        help="CVXPY solver",
+    )
+    parser.add_argument(
+        "--throughputs_file", type=str, default=None, help="Oracle throughputs file"
+    )
+    parser.add_argument(
+        "--expected_num_workers",
+        type=int,
+        default=None,
+        help="Total number of workers expected",
+    )
+    parser.add_argument(
+        "--time_per_iteration",
+        type=int,
+        default=360,
+        help="Time per iteration in seconds",
+    )
+    parser.add_argument(
+        "-s",
+        "--window-start",
+        type=int,
+        default=None,
+        help="measurement window start (job id)",
+    )
+    parser.add_argument(
+        "-e",
+        "--window-end",
+        type=int,
+        default=None,
+        help="Measurement window end (job ID)",
+    )
+    parser.add_argument(
+        "--max_rounds", type=int, default=None, help="Maximum number of rounds to run"
+    )
+    parser.add_argument(
+        "--timeline_dir", type=str, default=None, help="Directory to save timelnes to"
+    )
     main(parser.parse_args())

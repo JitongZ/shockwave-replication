@@ -1,11 +1,13 @@
 import grpc
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '../rpc_stubs'))
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "../rpc_stubs"))
 
 import scheduler_to_worker_pb2 as s2w_pb2
 import scheduler_to_worker_pb2_grpc as s2w_pb2_grpc
-import common_pb2 
+import common_pb2
+
 
 class SchedulerRpcClient:
     """Scheduler client for sending RPC requests to a worker server."""
@@ -13,7 +15,7 @@ class SchedulerRpcClient:
     def __init__(self, server_ip_addr, port):
         self._addr = server_ip_addr
         self._port = port
-        self._server_loc = '%s:%d' % (server_ip_addr, port)
+        self._server_loc = "%s:%d" % (server_ip_addr, port)
 
     @property
     def addr(self):
@@ -27,10 +29,16 @@ class SchedulerRpcClient:
         with grpc.insecure_channel(self._server_loc) as channel:
             stub = s2w_pb2_grpc.SchedulerToWorkerStub(channel)
             request = s2w_pb2.RunJobRequest()
-            for (job_id, command, working_directory, needs_data_dir,
-                 num_steps_arg, num_steps) in job_descriptions:
+            for (
+                job_id,
+                command,
+                working_directory,
+                needs_data_dir,
+                num_steps_arg,
+                num_steps,
+            ) in job_descriptions:
                 job_description = request.job_descriptions.add()
-                job_description.job_id = job_id[0] # job_id is a JobIdPair
+                job_description.job_id = job_id[0]  # job_id is a JobIdPair
                 job_description.command = command
                 job_description.working_directory = working_directory
                 job_description.needs_data_dir = needs_data_dir
@@ -44,7 +52,7 @@ class SchedulerRpcClient:
         with grpc.insecure_channel(self._server_loc) as channel:
             stub = s2w_pb2_grpc.SchedulerToWorkerStub(channel)
             request = s2w_pb2.KillJobRequest()
-            request.job_id = job_id[0] # job_id is a JobIdPair
+            request.job_id = job_id[0]  # job_id is a JobIdPair
             response = stub.KillJob(request)
 
     def reset(self):

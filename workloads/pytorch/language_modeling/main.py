@@ -18,78 +18,110 @@ lm_dir = os.path.dirname(os.path.realpath(__file__))
 pytorch_dir = os.path.dirname(lm_dir)
 workloads_dir = os.path.dirname(pytorch_dir)
 gpusched_dir = os.path.dirname(workloads_dir)
-scheduler_dir = os.path.join(gpusched_dir, 'scheduler')
+scheduler_dir = os.path.join(gpusched_dir, "scheduler")
 sys.path.append(scheduler_dir)
 from gavel_iterator import GavelIterator
 
-parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Language Model')
-parser.add_argument('--data', type=str, required=True,
-                    help='location of the data corpus')
-parser.add_argument('--model', type=str, default='LSTM',
-                    help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
-parser.add_argument('--emsize', type=int, default=200,
-                    help='size of word embeddings')
-parser.add_argument('--nhid', type=int, default=200,
-                    help='number of hidden units per layer')
-parser.add_argument('--nlayers', type=int, default=2,
-                    help='number of layers')
-parser.add_argument('--lr', type=float, default=20,
-                    help='initial learning rate')
-parser.add_argument('--clip', type=float, default=0.25,
-                    help='gradient clipping')
-parser.add_argument('--epochs', type=int, default=None,
-                    help='upper epoch limit')
-parser.add_argument('--steps', type=int, default=None,
-                    help='upper steps limit')
-parser.add_argument('--batch_size', type=int, default=20, metavar='N',
-                    help='batch size')
-parser.add_argument('--bptt', type=int, default=35,
-                    help='sequence length')
-parser.add_argument('--dropout', type=float, default=0.2,
-                    help='dropout applied to layers (0 = no dropout)')
-parser.add_argument('--tied', action='store_true',
-                    help='tie the word embedding and softmax weights')
-parser.add_argument('--seed', type=int, default=1111,
-                    help='random seed')
-parser.add_argument('--cuda', action='store_true',
-                    help='use CUDA')
-parser.add_argument('--log-interval', type=int, default=200, metavar='N',
-                    help='report interval')
-parser.add_argument('--checkpoint_dir', type=str,
-                    default='/lfs/1/keshav2/checkpoints',
-                    help='Checkpoint dir')
-parser.add_argument('--onnx-export', type=str, default='',
-                    help='path to export the final model in onnx format')
-parser.add_argument('--throughput_estimation_interval', type=int, default=None,
-                    help='Steps between logging steps completed')
+parser = argparse.ArgumentParser(
+    description="PyTorch Wikitext-2 RNN/LSTM Language Model"
+)
+parser.add_argument(
+    "--data", type=str, required=True, help="location of the data corpus"
+)
+parser.add_argument(
+    "--model",
+    type=str,
+    default="LSTM",
+    help="type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)",
+)
+parser.add_argument("--emsize", type=int, default=200, help="size of word embeddings")
+parser.add_argument(
+    "--nhid", type=int, default=200, help="number of hidden units per layer"
+)
+parser.add_argument("--nlayers", type=int, default=2, help="number of layers")
+parser.add_argument("--lr", type=float, default=20, help="initial learning rate")
+parser.add_argument("--clip", type=float, default=0.25, help="gradient clipping")
+parser.add_argument("--epochs", type=int, default=None, help="upper epoch limit")
+parser.add_argument("--steps", type=int, default=None, help="upper steps limit")
+parser.add_argument(
+    "--batch_size", type=int, default=20, metavar="N", help="batch size"
+)
+parser.add_argument("--bptt", type=int, default=35, help="sequence length")
+parser.add_argument(
+    "--dropout",
+    type=float,
+    default=0.2,
+    help="dropout applied to layers (0 = no dropout)",
+)
+parser.add_argument(
+    "--tied", action="store_true", help="tie the word embedding and softmax weights"
+)
+parser.add_argument("--seed", type=int, default=1111, help="random seed")
+parser.add_argument("--cuda", action="store_true", help="use CUDA")
+parser.add_argument(
+    "--log-interval", type=int, default=200, metavar="N", help="report interval"
+)
+parser.add_argument(
+    "--checkpoint_dir",
+    type=str,
+    default="/lfs/1/keshav2/checkpoints",
+    help="Checkpoint dir",
+)
+parser.add_argument(
+    "--onnx-export",
+    type=str,
+    default="",
+    help="path to export the final model in onnx format",
+)
+parser.add_argument(
+    "--throughput_estimation_interval",
+    type=int,
+    default=None,
+    help="Steps between logging steps completed",
+)
 
-parser.add_argument('--dist-url', default='env://', type=str,
-                            help='url used to set up distributed training')
-parser.add_argument('--dist-backend', default='nccl', type=str,
-                            help='Distributed backend')
-parser.add_argument('--local_rank', default=0, type=int,
-                            help='Local rank')
-parser.add_argument('--rank', default=None, type=int,
-                            help='Rank')
-parser.add_argument('--world_size', default=None, type=int,
-                            help='World size')
-parser.add_argument('--master_addr', default=None, type=str,
-                            help='Master address to use for distributed run')
-parser.add_argument('--master_port', default=None, type=int,
-                            help='Master port to use for distributed run')
-parser.add_argument('--max_duration', type=int, default=None,
-                    help='Maximum duration in seconds')
-parser.add_argument('--enable_gavel_iterator', action='store_true',
-                    default=False, help='If set, use Gavel iterator')
+parser.add_argument(
+    "--dist-url",
+    default="env://",
+    type=str,
+    help="url used to set up distributed training",
+)
+parser.add_argument(
+    "--dist-backend", default="nccl", type=str, help="Distributed backend"
+)
+parser.add_argument("--local_rank", default=0, type=int, help="Local rank")
+parser.add_argument("--rank", default=None, type=int, help="Rank")
+parser.add_argument("--world_size", default=None, type=int, help="World size")
+parser.add_argument(
+    "--master_addr",
+    default=None,
+    type=str,
+    help="Master address to use for distributed run",
+)
+parser.add_argument(
+    "--master_port",
+    default=None,
+    type=int,
+    help="Master port to use for distributed run",
+)
+parser.add_argument(
+    "--max_duration", type=int, default=None, help="Maximum duration in seconds"
+)
+parser.add_argument(
+    "--enable_gavel_iterator",
+    action="store_true",
+    default=False,
+    help="If set, use Gavel iterator",
+)
 
 args = parser.parse_args()
 
 torch.cuda.set_device(args.local_rank)
 
 if args.epochs is not None and args.steps is not None:
-    raise ValueError('Only one of epochs and steps may be set')
+    raise ValueError("Only one of epochs and steps may be set")
 elif args.epochs is None and args.steps is None:
-    raise ValueError('One of epochs and steps must be set')
+    raise ValueError("One of epochs and steps must be set")
 
 # Set the random seed manually for reproducibility.
 torch.manual_seed(args.seed)
@@ -117,6 +149,7 @@ corpus = data.Corpus(args.data)
 # dependence of e. g. 'g' on 'f' can not be learned, but allows more efficient
 # batch processing.
 
+
 class CorpusDataset(torch.utils.data.Dataset):
     def __init__(self, data, batch_size, bptt):
         self._data = data.narrow(0, 0, (data.size(0) // batch_size) * batch_size)
@@ -138,8 +171,10 @@ class CorpusDataset(torch.utils.data.Dataset):
     def get_input(self, row_idx, col_idx):
         row_idx = row_idx % len(self._data)
         seq_len = min(self._bptt, len(self._data) - 1 - row_idx)
-        data = self._data[row_idx: row_idx+seq_len, col_idx]
-        target = self._data[row_idx+1: row_idx+1+seq_len, col_idx].view(data.size())
+        data = self._data[row_idx : row_idx + seq_len, col_idx]
+        target = self._data[row_idx + 1 : row_idx + 1 + seq_len, col_idx].view(
+            data.size()
+        )
         data = torch.cat([data, data.new_zeros(self._bptt - data.size(0))])
         target = torch.cat([target, target.new_zeros(self._bptt - target.size(0))])
         return data, target
@@ -148,38 +183,37 @@ class CorpusDataset(torch.utils.data.Dataset):
         return self._data_length // self._bptt
 
     def __getitem__(self, idx):
-        return self.get_input((idx // self._batch_size) * self._bptt,
-                              idx % self._batch_size)
+        return self.get_input(
+            (idx // self._batch_size) * self._bptt, idx % self._batch_size
+        )
+
 
 eval_batch_size = 10
-train_dataset = CorpusDataset(corpus.train,
-                              args.batch_size,
-                              args.bptt)
-val_dataset = CorpusDataset(corpus.valid,
-                            eval_batch_size,
-                            args.bptt)
-test_dataset = CorpusDataset(corpus.test,
-                             eval_batch_size,
-                             args.bptt)
+train_dataset = CorpusDataset(corpus.train, args.batch_size, args.bptt)
+val_dataset = CorpusDataset(corpus.valid, eval_batch_size, args.bptt)
+test_dataset = CorpusDataset(corpus.test, eval_batch_size, args.bptt)
 
 ###############################################################################
 # Handle checkpoints
 ###############################################################################
 
+
 def load_checkpoint(args, checkpoint_path):
     try:
-        print('Loading checkpoint from %s...' % (checkpoint_path))
-        with open(checkpoint_path, 'rb') as f:
-            state = torch.load(f, map_location='cuda:{}'.format(args.local_rank))
+        print("Loading checkpoint from %s..." % (checkpoint_path))
+        with open(checkpoint_path, "rb") as f:
+            state = torch.load(f, map_location="cuda:{}".format(args.local_rank))
             return state
     except Exception as e:
-        print('Could not load from checkpoint: %s' % (e))
+        print("Could not load from checkpoint: %s" % (e))
         return None
 
+
 def save_checkpoint(state, checkpoint_path):
-    with open(checkpoint_path, 'wb') as f:
-        print('Saving checkpoint at %s...' % (checkpoint_path))
+    with open(checkpoint_path, "wb") as f:
+        print("Saving checkpoint at %s..." % (checkpoint_path))
         torch.save(state, f)
+
 
 ###############################################################################
 # Build the model
@@ -188,61 +222,72 @@ def save_checkpoint(state, checkpoint_path):
 args.distributed = False
 if args.master_addr is not None:
     args.distributed = True
-    os.environ['MASTER_ADDR'] = args.master_addr
-    os.environ['MASTER_PORT'] = str(args.master_port)
-    dist.init_process_group(backend=args.dist_backend,
-                            init_method=args.dist_url,
-                            world_size=args.world_size,
-                            rank=args.rank)
+    os.environ["MASTER_ADDR"] = args.master_addr
+    os.environ["MASTER_PORT"] = str(args.master_port)
+    dist.init_process_group(
+        backend=args.dist_backend,
+        init_method=args.dist_url,
+        world_size=args.world_size,
+        rank=args.rank,
+    )
 if args.distributed:
     train_sampler = torch.utils.data.distributed.DistributedSampler(
-        train_dataset, shuffle=False)
+        train_dataset, shuffle=False
+    )
 else:
     train_sampler = None
 
 ntokens = len(corpus.dictionary)
 
-train_loader = torch.utils.data.DataLoader(train_dataset,
-                                           batch_size=args.batch_size,
-                                           shuffle=False,
-                                           sampler=train_sampler,
-                                           drop_last=True)
-val_loader = torch.utils.data.DataLoader(val_dataset,
-                                         batch_size=eval_batch_size,
-                                         shuffle=False,
-                                         drop_last=True)
-test_loader = torch.utils.data.DataLoader(test_dataset,
-                                          batch_size=eval_batch_size,
-                                          shuffle=False,
-                                          drop_last=True)
+train_loader = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=args.batch_size,
+    shuffle=False,
+    sampler=train_sampler,
+    drop_last=True,
+)
+val_loader = torch.utils.data.DataLoader(
+    val_dataset, batch_size=eval_batch_size, shuffle=False, drop_last=True
+)
+test_loader = torch.utils.data.DataLoader(
+    test_dataset, batch_size=eval_batch_size, shuffle=False, drop_last=True
+)
 
 if args.enable_gavel_iterator:
-    train_loader = GavelIterator(train_loader, args.checkpoint_dir,
-                                 load_checkpoint, save_checkpoint)
+    train_loader = GavelIterator(
+        train_loader, args.checkpoint_dir, load_checkpoint, save_checkpoint
+    )
 
 state = None
 if args.checkpoint_dir is not None:
     if not os.path.isdir(args.checkpoint_dir):
         os.mkdir(args.checkpoint_dir)
     else:
-        checkpoint_path = os.path.join(args.checkpoint_dir, 'model.chkpt')
+        checkpoint_path = os.path.join(args.checkpoint_dir, "model.chkpt")
         if os.path.exists(checkpoint_path):
             if args.enable_gavel_iterator:
                 state = train_loader.load_checkpoint(args, checkpoint_path)
             else:
                 state = load_checkpoint(args, checkpoint_path)
 if state is not None:
-    model = state['model'].to(device)
+    model = state["model"].to(device)
     if model is None:
-        raise RuntimeError('Failed to get model from checkpoint!')
+        raise RuntimeError("Failed to get model from checkpoint!")
 else:
-    model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid,
-                           args.nlayers, args.dropout, args.tied).to(device)
+    model = model.RNNModel(
+        args.model,
+        ntokens,
+        args.emsize,
+        args.nhid,
+        args.nlayers,
+        args.dropout,
+        args.tied,
+    ).to(device)
 
 if args.distributed:
     model = torch.nn.parallel.DistributedDataParallel(
-                model, device_ids=[args.local_rank],
-                output_device=args.local_rank)
+        model, device_ids=[args.local_rank], output_device=args.local_rank
+    )
 
 cumulative_steps = 0
 cumulative_time = 0
@@ -254,6 +299,7 @@ optimizer = torch.optim.SGD(model.parameters(), args.lr)
 # Training code
 ###############################################################################
 
+
 def repackage_hidden(h):
     """Wraps hidden states in new Tensors, to detach them from their history."""
     if isinstance(h, torch.Tensor):
@@ -261,10 +307,11 @@ def repackage_hidden(h):
     else:
         return tuple(repackage_hidden(v) for v in h)
 
+
 def evaluate(loader):
     # Turn on evaluation mode which disables dropout.
     model.eval()
-    total_loss = 0.
+    total_loss = 0.0
     ntokens = len(corpus.dictionary)
     hidden = model.init_hidden(eval_batch_size)
     with torch.no_grad():
@@ -283,7 +330,7 @@ def evaluate(loader):
 def train(cumulative_steps=None, cumulative_time=None):
     # Turn on training mode which enables dropout.
     model.train()
-    total_loss = 0.
+    total_loss = 0.0
     start_time = time.time()
     ntokens = len(corpus.dictionary)
     if args.distributed:
@@ -318,36 +365,53 @@ def train(cumulative_steps=None, cumulative_time=None):
         if i % args.log_interval == 0 and i > 0:
             cur_loss = total_loss / args.log_interval
             elapsed = time.time() - start_time
-            print('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
-                    'loss {:5.2f} | ppl {:8.2f}'.format(
-                epoch, i, len(train_loader), lr,
-                elapsed * 1000 / args.log_interval, cur_loss, math.exp(cur_loss)))
+            print(
+                "| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | "
+                "loss {:5.2f} | ppl {:8.2f}".format(
+                    epoch,
+                    i,
+                    len(train_loader),
+                    lr,
+                    elapsed * 1000 / args.log_interval,
+                    cur_loss,
+                    math.exp(cur_loss),
+                )
+            )
             total_loss = 0
             start_time = time.time()
         if cumulative_steps is not None:
-          cumulative_steps += 1
-          if (args.throughput_estimation_interval is not None and
-              cumulative_steps % args.throughput_estimation_interval == 0):
-              print('[THROUGHPUT_ESTIMATION]\t%s\t%d' % (time.time(),
-                                                         cumulative_steps))
+            cumulative_steps += 1
+            if (
+                args.throughput_estimation_interval is not None
+                and cumulative_steps % args.throughput_estimation_interval == 0
+            ):
+                print(
+                    "[THROUGHPUT_ESTIMATION]\t%s\t%d" % (time.time(), cumulative_steps)
+                )
 
-          if args.steps is not None and cumulative_steps >= args.steps:
-            done = True
-            break
+            if args.steps is not None and cumulative_steps >= args.steps:
+                done = True
+                break
         if args.max_duration is not None:
-          cumulative_time += time.time() - total_duration_tracker_start
-          total_duration_tracker_start = time.time()
-          if cumulative_time >= args.max_duration:
-            done = True
-            break
+            cumulative_time += time.time() - total_duration_tracker_start
+            total_duration_tracker_start = time.time()
+            if cumulative_time >= args.max_duration:
+                done = True
+                break
 
     return (cumulative_steps, cumulative_time, done)
 
+
 def export_onnx(path, batch_size, seq_len):
-    print('The model is also exported in ONNX format at {}'.
-          format(os.path.realpath(args.onnx_export)))
+    print(
+        "The model is also exported in ONNX format at {}".format(
+            os.path.realpath(args.onnx_export)
+        )
+    )
     model.eval()
-    dummy_input = torch.LongTensor(seq_len * batch_size).zero_().view(-1, batch_size).to(device)
+    dummy_input = (
+        torch.LongTensor(seq_len * batch_size).zero_().view(-1, batch_size).to(device)
+    )
     hidden = model.init_hidden(batch_size)
     torch.onnx.export(model, (dummy_input, hidden), path)
 
@@ -359,16 +423,20 @@ best_val_loss = None
 # At any point you can hit Ctrl + C to break out of training early.
 try:
     if args.steps is not None:
-        args.epochs = math.ceil(args.steps *
-                                args.batch_size / len(train_loader))
+        args.epochs = math.ceil(args.steps * args.batch_size / len(train_loader))
     if args.epochs is None:
         args.epochs = args.steps
-    for epoch in range(1, args.epochs+1):
+    for epoch in range(1, args.epochs + 1):
         epoch_start_time = time.time()
-        cumulative_steps, cumulative_time, done = train(cumulative_steps,
-                                                        cumulative_time)
-        print('-' * 89)
-        print('| end of epoch {:3d} | time: {:5.2f}s'.format(epoch, (time.time() - epoch_start_time)))
+        cumulative_steps, cumulative_time, done = train(
+            cumulative_steps, cumulative_time
+        )
+        print("-" * 89)
+        print(
+            "| end of epoch {:3d} | time: {:5.2f}s".format(
+                epoch, (time.time() - epoch_start_time)
+            )
+        )
         if args.enable_gavel_iterator:
             if train_loader.done:
                 break
@@ -376,18 +444,18 @@ try:
                 train_loader.complete()
                 break
         elif done:
-          break
-        print('-' * 89)
-    checkpoint_path = os.path.join(args.checkpoint_dir, 'model.chkpt')
+            break
+        print("-" * 89)
+    checkpoint_path = os.path.join(args.checkpoint_dir, "model.chkpt")
     if not args.distributed or args.rank == 0:
         if args.distributed:
-            state = {'model': model.module}
+            state = {"model": model.module}
         else:
-            state = {'model': model}
+            state = {"model": model}
         if args.enable_gavel_iterator:
             train_loader.save_checkpoint(state, checkpoint_path)
         else:
             save_checkpoint(state, f)
 except KeyboardInterrupt:
-    print('-' * 89)
-    print('Exiting from training early')
+    print("-" * 89)
+    print("Exiting from training early")

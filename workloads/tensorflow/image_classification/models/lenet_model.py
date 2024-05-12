@@ -29,16 +29,16 @@ from models import model
 
 
 class Lenet5Model(model.CNNModel):
-  """Lenet5."""
+    """Lenet5."""
 
-  def __init__(self, params=None):
-    super(Lenet5Model, self).__init__('lenet5', 28, 32, 0.005, params=params)
+    def __init__(self, params=None):
+        super(Lenet5Model, self).__init__("lenet5", 28, 32, 0.005, params=params)
 
-  def add_inference(self, cnn):
-    # Note: This matches TF's MNIST tutorial model
-    cnn.conv(32, 5, 5)
-    cnn.mpool(2, 2)
-    cnn.conv(64, 5, 5)
-    cnn.mpool(2, 2)
-    cnn.reshape([-1, 64 * 7 * 7])
-    cnn.affine(512)
+    def add_inference(self, cnn):
+        # Note: This matches TF's MNIST tutorial model
+        cnn.conv(32, 5, 5)
+        cnn.mpool(2, 2)
+        cnn.conv(64, 5, 5)
+        cnn.mpool(2, 2)
+        cnn.reshape([-1, 64 * 7 * 7])
+        cnn.affine(512)

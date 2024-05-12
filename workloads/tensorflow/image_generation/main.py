@@ -1,10 +1,11 @@
-'''TensorFlow implementation of http://arxiv.org/pdf/1312.6114v10.pdf'''
+"""TensorFlow implementation of http://arxiv.org/pdf/1312.6114v10.pdf"""
 
 from __future__ import absolute_import, division, print_function
 
 import math
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 import datetime
 import time
@@ -33,8 +34,7 @@ flags.DEFINE_float("learning_rate", 1e-2, "learning rate")
 flags.DEFINE_string("working_directory", "", "")
 flags.DEFINE_integer("hidden_size", 128, "size of the hidden VAE unit")
 flags.DEFINE_string("model", "gan", "gan or vae")
-flags.DEFINE_float("max_duration", None,
-                   "Maximum training duration in minutes") 
+flags.DEFINE_float("max_duration", None, "Maximum training duration in minutes")
 
 FLAGS = flags.FLAGS
 
@@ -44,12 +44,12 @@ if __name__ == "__main__":
         os.makedirs(data_directory)
     mnist = input_data.read_data_sets(data_directory, one_hot=True)
 
-    assert FLAGS.model in ['vae', 'gan']
-    if FLAGS.model == 'vae':
+    assert FLAGS.model in ["vae", "gan"]
+    if FLAGS.model == "vae":
         model = VAE(FLAGS.hidden_size, FLAGS.batch_size, FLAGS.learning_rate)
-    elif FLAGS.model == 'gan':
+    elif FLAGS.model == "gan":
         model = GAN(FLAGS.hidden_size, FLAGS.batch_size, FLAGS.learning_rate)
-      
+
     start_time_mb = datetime.datetime.now()
     total_images = 0
     done = False
@@ -67,24 +67,22 @@ if __name__ == "__main__":
             seconds = (datetime.datetime.now() - start_time_mb).total_seconds()
             minutes = seconds / 60.0
             if FLAGS.max_duration is not None and minutes >= FLAGS.max_duration:
-              end_time_mb = datetime.datetime.now()
-              print("end:", str(end_time_mb))
-              total_time = (end_time_mb - start_time_mb).total_seconds()
-              total_throughput = total_images / float(total_time)
-              print('Total images/second: %.f' % (total_throughput)) 
-              done = True
-              break
+                end_time_mb = datetime.datetime.now()
+                print("end:", str(end_time_mb))
+                total_time = (end_time_mb - start_time_mb).total_seconds()
+                total_throughput = total_images / float(total_time)
+                print("Total images/second: %.f" % (total_throughput))
+                done = True
+                break
         if done == True:
-          break
+            break
 
-        training_loss = training_loss / \
-            (FLAGS.updates_per_epoch * FLAGS.batch_size)
+        training_loss = training_loss / (FLAGS.updates_per_epoch * FLAGS.batch_size)
 
         print("Loss %f" % training_loss)
 
-        model.generate_and_save_images(
-            FLAGS.batch_size, FLAGS.working_directory)
-        
+        model.generate_and_save_images(FLAGS.batch_size, FLAGS.working_directory)
+
         epoch += 1
         if FLAGS.max_duration is None and epoch == FLAGS.max_epoch:
-          break
+            break

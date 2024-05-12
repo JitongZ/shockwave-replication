@@ -23,16 +23,18 @@ class A3Clstm(torch.nn.Module):
         self.actor_linear = nn.Linear(512, num_outputs)
 
         self.apply(weights_init)
-        relu_gain = nn.init.calculate_gain('relu')
+        relu_gain = nn.init.calculate_gain("relu")
         self.conv1.weight.data.mul_(relu_gain)
         self.conv2.weight.data.mul_(relu_gain)
         self.conv3.weight.data.mul_(relu_gain)
         self.conv4.weight.data.mul_(relu_gain)
         self.actor_linear.weight.data = norm_col_init(
-            self.actor_linear.weight.data, 0.01)
+            self.actor_linear.weight.data, 0.01
+        )
         self.actor_linear.bias.data.fill_(0)
         self.critic_linear.weight.data = norm_col_init(
-            self.critic_linear.weight.data, 1.0)
+            self.critic_linear.weight.data, 1.0
+        )
         self.critic_linear.bias.data.fill_(0)
 
         self.lstm.bias_ih.data.fill_(0)

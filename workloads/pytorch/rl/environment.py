@@ -3,24 +3,26 @@ import gym
 import numpy as np
 from collections import deque
 from gym.spaces.box import Box
-#from skimage.color import rgb2gray
+
+# from skimage.color import rgb2gray
 from cv2 import resize
-#from skimage.transform import resize
-#from scipy.misc import imresize as resize
+
+# from skimage.transform import resize
+# from scipy.misc import imresize as resize
 import random
 
 
 def atari_env(env_id, env_conf, args):
     env = gym.make(env_id)
-    if 'NoFrameskip' in env_id:
-        assert 'NoFrameskip' in env.spec.id
+    if "NoFrameskip" in env_id:
+        assert "NoFrameskip" in env.spec.id
         env._max_episode_steps = args.max_episode_length * args.skip_rate
         env = NoopResetEnv(env, noop_max=30)
         env = MaxAndSkipEnv(env, skip=args.skip_rate)
     else:
         env._max_episode_steps = args.max_episode_length
     env = EpisodicLifeEnv(env)
-    if 'FIRE' in env.unwrapped.get_action_meanings():
+    if "FIRE" in env.unwrapped.get_action_meanings():
         env = FireResetEnv(env)
     env._max_episode_steps = args.max_episode_length
     env = AtariRescale(env, env_conf)
@@ -29,10 +31,10 @@ def atari_env(env_id, env_conf, args):
 
 
 def process_frame(frame, conf):
-    frame = frame[conf["crop1"]:conf["crop2"] + 160, :160]
+    frame = frame[conf["crop1"] : conf["crop2"] + 160, :160]
     frame = frame.mean(2)
     frame = frame.astype(np.float32)
-    frame *= (1.0 / 255.0)
+    frame *= 1.0 / 255.0
     frame = resize(frame, (80, conf["dimension2"]))
     frame = resize(frame, (80, 80))
     frame = np.reshape(frame, [1, 80, 80])
@@ -59,10 +61,12 @@ class NormalizedEnv(gym.ObservationWrapper):
 
     def observation(self, observation):
         self.num_steps += 1
-        self.state_mean = self.state_mean * self.alpha + \
-            observation.mean() * (1 - self.alpha)
-        self.state_std = self.state_std * self.alpha + \
-            observation.std() * (1 - self.alpha)
+        self.state_mean = self.state_mean * self.alpha + observation.mean() * (
+            1 - self.alpha
+        )
+        self.state_std = self.state_std * self.alpha + observation.std() * (
+            1 - self.alpha
+        )
 
         unbiased_mean = self.state_mean / (1 - pow(self.alpha, self.num_steps))
         unbiased_std = self.state_std / (1 - pow(self.alpha, self.num_steps))
@@ -79,15 +83,17 @@ class NoopResetEnv(gym.Wrapper):
         self.noop_max = noop_max
         self.override_num_noops = None
         self.noop_action = 0
-        assert env.unwrapped.get_action_meanings()[0] == 'NOOP'
+        assert env.unwrapped.get_action_meanings()[0] == "NOOP"
 
     def reset(self, **kwargs):
-        """ Do no-op action for a number of steps in [1, noop_max]."""
+        """Do no-op action for a number of steps in [1, noop_max]."""
         self.env.reset(**kwargs)
         if self.override_num_noops is not None:
             noops = self.override_num_noops
         else:
-            noops = self.unwrapped.np_random.randint(1, self.noop_max + 1)  #pylint: disable=E1101
+            noops = self.unwrapped.np_random.randint(
+                1, self.noop_max + 1
+            )  # pylint: disable=E1101
         assert noops > 0
         obs = None
         for _ in range(noops):
@@ -104,7 +110,7 @@ class FireResetEnv(gym.Wrapper):
     def __init__(self, env):
         """Take action on reset for environments that are fixed until firing."""
         gym.Wrapper.__init__(self, env)
-        assert env.unwrapped.get_action_meanings()[1] == 'FIRE'
+        assert env.unwrapped.get_action_meanings()[1] == "FIRE"
         assert len(env.unwrapped.get_action_meanings()) >= 3
 
     def reset(self, **kwargs):
@@ -186,4 +192,3 @@ class MaxAndSkipEnv(gym.Wrapper):
         obs = self.env.reset(**kwargs)
         self._obs_buffer.append(obs)
         return obs
-

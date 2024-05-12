@@ -1,8 +1,8 @@
-'''TensorFlow implementation of http://arxiv.org/pdf/1502.04623v2.pdf
+"""TensorFlow implementation of http://arxiv.org/pdf/1502.04623v2.pdf
 
 DISCLAIMER
 Work in progress. This code requires massive refactoring.
-'''
+"""
 
 from __future__ import absolute_import, division, print_function
 
@@ -37,7 +37,7 @@ FLAGS = flags.FLAGS
 # inspired by https://github.com/jbornschein/draw
 # TODO: better names for N, A, B
 def filterbank_matrices(g_x, g_y, delta, sigma, N, A, B):
-    ''' Computer filter bank matrices. All inputs are in batches.
+    """Computer filter bank matrices. All inputs are in batches.
 
     Args:
         g_x, g_y: grid centers, relative to the center of the image
@@ -47,7 +47,7 @@ def filterbank_matrices(g_x, g_y, delta, sigma, N, A, B):
         A, B: input image dimensions, width and height
     Returns:
         F_x, F_y: filter banks matrices [batch, N, A] and [batch, N, B]
-    '''
+    """
 
     rng = tf.reshape(tf.cast(tf.range(N), tf.float32), [1, -1])
 
@@ -73,14 +73,14 @@ def filterbank_matrices(g_x, g_y, delta, sigma, N, A, B):
 
 
 def apply_filters(image, F_x, F_y, gamma, N, A, B, forward=True, epsilon=1e-9):
-    '''Apply a batch of filter banks to a batch of images.
+    """Apply a batch of filter banks to a batch of images.
 
     Args:
         image: image, [batch, w, h, c]
         F_x, F_y: filter banks matrices [batch, N, A] and [batch, N, B]
     Returns:
         filtered image
-    '''
+    """
 
     F_x = F_x / tf.maximum(tf.reduce_sum(F_x, 2, keep_dims=True), epsilon)
     F_y = F_y / tf.maximum(tf.reduce_sum(F_y, 2, keep_dims=True), epsilon)
@@ -114,14 +114,14 @@ def apply_filters(image, F_x, F_y, gamma, N, A, B, forward=True, epsilon=1e-9):
 
 
 def transform_params(input_tensor, N, A, B):
-    '''Transformes a raw NN output into a set of parameters
+    """Transformes a raw NN output into a set of parameters
         See the paper.
     Args:
         input_tensor:
         N:
         A:
         B:
-    '''
+    """
     g_x, g_y, log_sigma_sqr, log_delta, log_gamma = tf.split(1, 5, input_tensor)
     g_x = (A + 1) / 2 * (g_x + 1)
     g_y = (B + 1) / 2 * (g_y + 1)
@@ -132,20 +132,22 @@ def transform_params(input_tensor, N, A, B):
 
 
 def get_vae_cost(mean, stddev, epsilon=1e-8):
-    '''VAE loss
+    """VAE loss
         See the paper
 
     Args:
         mean:
         stddev:
         epsilon:
-    '''
-    return tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(stddev) -
-                                2.0 * tf.log(stddev + epsilon) - 1.0))
+    """
+    return tf.reduce_sum(
+        0.5
+        * (tf.square(mean) + tf.square(stddev) - 2.0 * tf.log(stddev + epsilon) - 1.0)
+    )
 
 
 def get_reconstruction_cost(output_tensor, target_tensor, epsilon=1e-8):
-    '''Reconstruction loss
+    """Reconstruction loss
 
     Cross entropy reconstruction loss
 
@@ -153,9 +155,12 @@ def get_reconstruction_cost(output_tensor, target_tensor, epsilon=1e-8):
         output_tensor: tensor produces by decoder
         target_tensor: the target tensor that we want to reconstruct
         epsilon:
-    '''
-    return tf.reduce_sum(-target_tensor * tf.log(output_tensor + epsilon) -
-                         (1.0 - target_tensor) * tf.log(1.0 - output_tensor + epsilon))
+    """
+    return tf.reduce_sum(
+        -target_tensor * tf.log(output_tensor + epsilon)
+        - (1.0 - target_tensor) * tf.log(1.0 - output_tensor + epsilon)
+    )
+
 
 if __name__ == "__main__":
     data_directory = os.path.join(FLAGS.working_directory, "MNIST")
@@ -180,34 +185,42 @@ if __name__ == "__main__":
 
     loss = 0.0
     with tf.variable_scope("model"):
-        with pt.defaults_scope(activation_fn=tf.nn.elu,
-                               batch_normalize=True,
-                               learned_moments_update_rate=0.1,
-                               variance_epsilon=0.001,
-                               scale_after_normalization=True):
+        with pt.defaults_scope(
+            activation_fn=tf.nn.elu,
+            batch_normalize=True,
+            learned_moments_update_rate=0.1,
+            variance_epsilon=0.001,
+            scale_after_normalization=True,
+        ):
             # Encoder RNN (Eq. 5)
-            encoder_template = (pt.template('input').
-                                gru_cell(num_units=FLAGS.rnn_size, state=pt.UnboundVariable('state')))
+            encoder_template = pt.template("input").gru_cell(
+                num_units=FLAGS.rnn_size, state=pt.UnboundVariable("state")
+            )
 
             # Projection of encoder RNN output (Eq. 1-2)
-            encoder_proj_template = (pt.template('input').
-                                     fully_connected(FLAGS.hidden_size * 2, activation_fn=None))
+            encoder_proj_template = pt.template("input").fully_connected(
+                FLAGS.hidden_size * 2, activation_fn=None
+            )
 
             # Params of read from decoder RNN output (Eq. 21)
-            decoder_read_params_template = (pt.template('input').
-                                            fully_connected(5, activation_fn=None))
+            decoder_read_params_template = pt.template("input").fully_connected(
+                5, activation_fn=None
+            )
 
             # Decoder RNN (Eq. 7)
-            decoder_template = (pt.template('input').
-                                gru_cell(num_units=FLAGS.rnn_size, state=pt.UnboundVariable('state')))
+            decoder_template = pt.template("input").gru_cell(
+                num_units=FLAGS.rnn_size, state=pt.UnboundVariable("state")
+            )
 
             # Projection of decoder RNN output (Eq. 18)
-            decoder_proj_template = (pt.template('input').
-                                     fully_connected(FLAGS.N * FLAGS.N, activation_fn=None))
+            decoder_proj_template = pt.template("input").fully_connected(
+                FLAGS.N * FLAGS.N, activation_fn=None
+            )
 
             # Projection of decoder RNN output (Eq. 18)
-            decoder_write_params_template = (pt.template('input').
-                                             fully_connected(5, activation_fn=None))
+            decoder_write_params_template = pt.template("input").fully_connected(
+                5, activation_fn=None
+            )
 
             for _ in range(FLAGS.rnn_len):
                 epsilon = tf.random_normal([FLAGS.batch_size, FLAGS.hidden_size])
@@ -217,50 +230,80 @@ if __name__ == "__main__":
                 # intended.
                 with pt.defaults_scope(phase=pt.Phase.train):
                     attention_params = decoder_read_params_template.construct(
-                        input=decoder_state[0].tensor)
+                        input=decoder_state[0].tensor
+                    )
                     g_x, g_y, delta, sigma, gamma = transform_params(
-                        attention_params, FLAGS.N, 28, 28)
+                        attention_params, FLAGS.N, 28, 28
+                    )
                     F_x, F_y = filterbank_matrices(
-                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28)
-                    image_tensor = tf.reshape(input_tensor, [FLAGS.batch_size, 28, 28, 1])
-                    image_glipse = apply_filters(image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28)
+                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28
+                    )
+                    image_tensor = tf.reshape(
+                        input_tensor, [FLAGS.batch_size, 28, 28, 1]
+                    )
+                    image_glipse = apply_filters(
+                        image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28
+                    )
 
                     image_hat_tensor = tf.reshape(
-                        input_tensor - tf.nn.sigmoid(output_tensor), [FLAGS.batch_size, 28, 28, 1])
+                        input_tensor - tf.nn.sigmoid(output_tensor),
+                        [FLAGS.batch_size, 28, 28, 1],
+                    )
                     image_hat_glipse = apply_filters(
-                        image_hat_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28)
+                        image_hat_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28
+                    )
 
                     encoder_input_tensor = pt.wrap(
-                        tf.concat(1, [tf.reshape(image_glipse, [FLAGS.batch_size, -1]), tf.reshape(image_hat_glipse, [FLAGS.batch_size, -1]), decoder_state[0].tensor]))
+                        tf.concat(
+                            1,
+                            [
+                                tf.reshape(image_glipse, [FLAGS.batch_size, -1]),
+                                tf.reshape(image_hat_glipse, [FLAGS.batch_size, -1]),
+                                decoder_state[0].tensor,
+                            ],
+                        )
+                    )
 
                     encoded_tensor, encoder_state = encoder_template.construct(
-                        input=encoder_input_tensor, state=encoder_state[0].tensor)
+                        input=encoder_input_tensor, state=encoder_state[0].tensor
+                    )
 
-                    hidden_tensor = encoder_proj_template.construct(input=encoded_tensor)
-                    mean = hidden_tensor[:, :FLAGS.hidden_size]
-                    stddev = tf.sqrt(tf.exp(hidden_tensor[:, FLAGS.hidden_size:]))
+                    hidden_tensor = encoder_proj_template.construct(
+                        input=encoded_tensor
+                    )
+                    mean = hidden_tensor[:, : FLAGS.hidden_size]
+                    stddev = tf.sqrt(tf.exp(hidden_tensor[:, FLAGS.hidden_size :]))
                     input_sample = mean + epsilon * stddev
 
                     decoder_output_tensor, decoder_state = decoder_template.construct(
-                        input=input_sample, state=decoder_state[0].tensor)
+                        input=input_sample, state=decoder_state[0].tensor
+                    )
 
                     attention_params = decoder_write_params_template.construct(
-                        input=decoder_state[0].tensor)
+                        input=decoder_state[0].tensor
+                    )
                     g_x, g_y, delta, sigma, gamma = transform_params(
-                        attention_params, FLAGS.N, 28, 28)
+                        attention_params, FLAGS.N, 28, 28
+                    )
                     F_x, F_y = filterbank_matrices(
-                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28)
+                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28
+                    )
 
                     decoder_output_image_tensor = decoder_proj_template.construct(
-                        input=decoder_output_tensor)
+                        input=decoder_output_tensor
+                    )
 
-                    image_tensor = tf.reshape(decoder_output_image_tensor, [
-                                              FLAGS.batch_size, FLAGS.N, FLAGS.N, 1])
+                    image_tensor = tf.reshape(
+                        decoder_output_image_tensor,
+                        [FLAGS.batch_size, FLAGS.N, FLAGS.N, 1],
+                    )
                     image_glipse = apply_filters(
-                        image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28, False)
+                        image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28, False
+                    )
 
-                    output_tensor = output_tensor + \
-                        tf.reshape(image_glipse, [FLAGS.batch_size, -1])
+                    output_tensor = output_tensor + tf.reshape(
+                        image_glipse, [FLAGS.batch_size, -1]
+                    )
 
                     vae_loss = get_vae_cost(mean, stddev)
 
@@ -268,34 +311,46 @@ if __name__ == "__main__":
 
                 with pt.defaults_scope(phase=pt.Phase.test):
                     decoder_output_tensor, sampled_state = decoder_template.construct(
-                        input=epsilon, state=sampled_state[0].tensor)
+                        input=epsilon, state=sampled_state[0].tensor
+                    )
 
                     attention_params = decoder_write_params_template.construct(
-                        input=sampled_state[0].tensor)
+                        input=sampled_state[0].tensor
+                    )
 
                     params_tensors.append(attention_params)
 
                     g_x, g_y, delta, sigma, gamma = transform_params(
-                        attention_params, FLAGS.N, 28, 28)
+                        attention_params, FLAGS.N, 28, 28
+                    )
                     F_x, F_y = filterbank_matrices(
-                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28)
+                        g_x, g_y, delta, sigma, FLAGS.N, 28, 28
+                    )
 
                     decoder_output_image_tensor = decoder_proj_template.construct(
-                        input=decoder_output_tensor)
+                        input=decoder_output_tensor
+                    )
 
-                    image_tensor = tf.reshape(decoder_output_image_tensor, [
-                                              FLAGS.batch_size, FLAGS.N, FLAGS.N, 1])
+                    image_tensor = tf.reshape(
+                        decoder_output_image_tensor,
+                        [FLAGS.batch_size, FLAGS.N, FLAGS.N, 1],
+                    )
 
-                    glimpse_tensors.append(tf.nn.sigmoid(
-                        tf.reshape(1.0 / gamma, [-1, 1, 1, 1]) * image_tensor))
+                    glimpse_tensors.append(
+                        tf.nn.sigmoid(
+                            tf.reshape(1.0 / gamma, [-1, 1, 1, 1]) * image_tensor
+                        )
+                    )
 
                     image_glipse = apply_filters(
-                        image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28, False)
+                        image_tensor, F_x, F_y, gamma, FLAGS.N, 28, 28, False
+                    )
 
                     write_tensors.append(tf.nn.sigmoid(image_glipse))
 
-                    sampled_tensor = sampled_tensor + \
-                        tf.reshape(image_glipse, [FLAGS.batch_size, -1])
+                    sampled_tensor = sampled_tensor + tf.reshape(
+                        image_glipse, [FLAGS.batch_size, -1]
+                    )
 
                     sampled_tensors.append(tf.nn.sigmoid(sampled_tensor))
 
@@ -314,7 +369,7 @@ if __name__ == "__main__":
             training_loss = 0.0
 
             widgets = ["epoch #%d|" % epoch, Percentage(), Bar(), ETA()]
-            pbar = ProgressBar(max_value = FLAGS.updates_per_epoch, widgets=widgets)
+            pbar = ProgressBar(max_value=FLAGS.updates_per_epoch, widgets=widgets)
             pbar.start()
             for i in range(FLAGS.updates_per_epoch):
                 pbar.update(i)
@@ -322,12 +377,15 @@ if __name__ == "__main__":
                 _, loss_value = sess.run([train, loss], {input_tensor: x})
                 training_loss += loss_value
 
-            training_loss = training_loss / \
-                (FLAGS.updates_per_epoch * 28 * 28 * FLAGS.batch_size)
+            training_loss = training_loss / (
+                FLAGS.updates_per_epoch * 28 * 28 * FLAGS.batch_size
+            )
 
             print("Loss %f" % training_loss)
 
-            results = sess.run(sampled_tensors + write_tensors + glimpse_tensors + params_tensors)
+            results = sess.run(
+                sampled_tensors + write_tensors + glimpse_tensors + params_tensors
+            )
 
             imgs = []
             write_imgs = []
@@ -341,15 +399,21 @@ if __name__ == "__main__":
                 img_params.append(results[i + len(results) // 4 * 3])
 
             for k in range(FLAGS.batch_size):
-                imgs_folder = os.path.join(FLAGS.working_directory, 'imgs')
+                imgs_folder = os.path.join(FLAGS.working_directory, "imgs")
                 if not os.path.exists(imgs_folder):
                     os.makedirs(imgs_folder)
                 for i in range(len(imgs)):
-                    imsave(os.path.join(imgs_folder, '%d_%d.png') % (k, i),
-                           imgs[i][k].reshape(28, 28))
+                    imsave(
+                        os.path.join(imgs_folder, "%d_%d.png") % (k, i),
+                        imgs[i][k].reshape(28, 28),
+                    )
 
-                    imsave(os.path.join(imgs_folder, '%d_%d_w.png') % (k, i),
-                           write_imgs[i][k].reshape(28, 28))
+                    imsave(
+                        os.path.join(imgs_folder, "%d_%d_w.png") % (k, i),
+                        write_imgs[i][k].reshape(28, 28),
+                    )
 
-                    imsave(os.path.join(imgs_folder, '%d_%d_g.png') % (k, i),
-                           glimpse_imgs[i][k].reshape(FLAGS.N, FLAGS.N))
+                    imsave(
+                        os.path.join(imgs_folder, "%d_%d_g.png") % (k, i),
+                        glimpse_imgs[i][k].reshape(FLAGS.N, FLAGS.N),
+                    )

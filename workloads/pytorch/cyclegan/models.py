@@ -79,7 +79,11 @@ class GeneratorResNet(nn.Module):
             in_features = out_features
 
         # Output layer
-        model += [nn.ReflectionPad2d(channels), nn.Conv2d(out_features, channels, 7), nn.Tanh()]
+        model += [
+            nn.ReflectionPad2d(channels),
+            nn.Conv2d(out_features, channels, 7),
+            nn.Tanh(),
+        ]
 
         self.model = nn.Sequential(*model)
 
@@ -99,7 +103,7 @@ class Discriminator(nn.Module):
         channels, height, width = input_shape
 
         # Calculate output shape of image discriminator (PatchGAN)
-        self.output_shape = (1, height // 2 ** 4, width // 2 ** 4)
+        self.output_shape = (1, height // 2**4, width // 2**4)
 
         def discriminator_block(in_filters, out_filters, normalize=True):
             """Returns downsampling layers of each discriminator block"""

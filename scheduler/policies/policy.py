@@ -1,4 +1,5 @@
 import os, sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 import cvxpy as cp
@@ -6,9 +7,10 @@ import numpy as np
 
 import job_id_pair
 
+
 class Policy:
 
-    def __init__(self, solver='ECOS'):
+    def __init__(self, solver="ECOS"):
         self._name = None
         self._solver = solver
 
@@ -30,8 +32,7 @@ class Policy:
         if len(job_ids) == 0:
             return None, None
         worker_types = sorted(list(d[job_ids[0]].keys()))
-        self._num_workers = \
-            [cluster_spec[worker_type] for worker_type in worker_types]
+        self._num_workers = [cluster_spec[worker_type] for worker_type in worker_types]
         if len(worker_types) == 0:
             return None, None
         m = []
@@ -57,15 +58,14 @@ class Policy:
         """Return base constraints."""
         return [
             x >= 0,
-            cp.sum(cp.multiply(
-                scale_factors_array, x), axis=0) <= self._num_workers,
+            cp.sum(cp.multiply(scale_factors_array, x), axis=0) <= self._num_workers,
             cp.sum(x, axis=1) <= 1,
         ]
 
 
 class PolicyWithPacking(Policy):
 
-    def __init__(self, solver='ECOS'):
+    def __init__(self, solver="ECOS"):
         Policy.__init__(self, solver)
 
     def scale_factors_array(self, scale_factors, job_ids, m, n):
@@ -73,8 +73,10 @@ class PolicyWithPacking(Policy):
         for i in range(m):
             scale_factor = None
             for single_job_id in job_ids[i].singletons():
-                if (scale_factor is not None and
-                    scale_factor != scale_factors[single_job_id]):
+                if (
+                    scale_factor is not None
+                    and scale_factor != scale_factors[single_job_id]
+                ):
                     scale_factor = 0
                 else:
                     scale_factor = scale_factors[single_job_id]
@@ -98,8 +100,7 @@ class PolicyWithPacking(Policy):
         if len(job_ids) == 0:
             return None, None
         worker_types = sorted(list(d[job_ids[0]].keys()))
-        self._num_workers = \
-            [cluster_spec[worker_type] for worker_type in worker_types]
+        self._num_workers = [cluster_spec[worker_type] for worker_type in worker_types]
 
         # Stores which indexes in job_ids are relevant for each single job ID.
         relevant_combinations = {}
@@ -146,8 +147,12 @@ class PolicyWithPacking(Policy):
             # Normalize.
             if priority_weights is not None:
                 all_m[i] /= priority_weights[single_job_id]
-        return all_m, (job_ids, sorted_single_job_ids, worker_types,
-                       relevant_combinations)
+        return all_m, (
+            job_ids,
+            sorted_single_job_ids,
+            worker_types,
+            relevant_combinations,
+        )
 
     def unflatten(self, m, index):
         """Converts a NumPy array to a 2-level dict."""
@@ -160,13 +165,14 @@ class PolicyWithPacking(Policy):
                 d[job_id_combinations[i]][worker_types[j]] = m[i][j]
         return d
 
-    def get_base_constraints(self, x, single_job_ids,
-                             scale_factors_array, relevant_combinations):
+    def get_base_constraints(
+        self, x, single_job_ids, scale_factors_array, relevant_combinations
+    ):
         """Return base constraints."""
         constraints = [
             x >= 0,
-            cp.sum(cp.multiply(
-                scale_factors_array, x), axis=0) <= np.array(self._num_workers),
+            cp.sum(cp.multiply(scale_factors_array, x), axis=0)
+            <= np.array(self._num_workers),
         ]
 
         # Every job cannot receive a total time share sum greater than 1.0.
@@ -175,9 +181,11 @@ class PolicyWithPacking(Policy):
             indexes = relevant_combinations[single_job_id]
             idx += indexes
         index_var = x[idx]
-        index_var = cp.reshape(index_var,
-            (len(single_job_ids), int(np.prod(index_var.shape) /
-             len(single_job_ids))), order='C')
+        index_var = cp.reshape(
+            index_var,
+            (len(single_job_ids), int(np.prod(index_var.shape) / len(single_job_ids))),
+            order="C",
+        )
         constraints.append(cp.sum(index_var, axis=1) <= 1)
         return constraints
 
@@ -185,8 +193,9 @@ class PolicyWithPacking(Policy):
         """Converts a job-job_type allocation to a job-job allocation."""
         job_ids = sorted(allocation.keys())
         worker_types = sorted(allocation[job_ids[0]].keys())
-        job_type_keys = \
-            sorted(set([job_id_to_job_type_key[job_id] for job_id in job_ids]))
+        job_type_keys = sorted(
+            set([job_id_to_job_type_key[job_id] for job_id in job_ids])
+        )
 
         # Initialize job_type-job_type allocation.
         job_type_allocation = {}
@@ -194,8 +203,7 @@ class PolicyWithPacking(Policy):
             job_type_allocation[worker_type] = {}
             for job_type_key in job_type_keys:
                 job_type_allocation[worker_type][job_type_key] = {}
-                job_type_allocation_ = \
-                    job_type_allocation[worker_type][job_type_key]
+                job_type_allocation_ = job_type_allocation[worker_type][job_type_key]
                 for other_job_type_key in [None] + job_type_keys:
                     job_type_allocation_[other_job_type_key] = 0.0
 
@@ -204,8 +212,9 @@ class PolicyWithPacking(Policy):
             for job_id in allocation:
                 job_type_key = job_id_to_job_type_key[job_id]
                 for other_job_type_key in allocation[job_id][worker_type]:
-                    job_type_allocation[worker_type][job_type_key][other_job_type_key] += \
-                        allocation[job_id][worker_type][other_job_type_key]
+                    job_type_allocation[worker_type][job_type_key][
+                        other_job_type_key
+                    ] += allocation[job_id][worker_type][other_job_type_key]
 
         # Compute job-job allocations using the following formula:
         # x_{i,j} = x_{i, job_type(j)} * x_{j, job_type(i)} /
@@ -216,25 +225,28 @@ class PolicyWithPacking(Policy):
             job_type_key = job_id_to_job_type_key[job_id]
             # Set the isolated allocations.
             for worker_type in worker_types:
-                converted_allocation[job_id][worker_type] = \
-                    allocation[job_id][worker_type][None]
+                converted_allocation[job_id][worker_type] = allocation[job_id][
+                    worker_type
+                ][None]
             # Set the packed allocations.
-            for other_job_id in job_ids[i+1:]:
+            for other_job_id in job_ids[i + 1 :]:
                 other_job_type_key = job_id_to_job_type_key[other_job_id]
-                merged_job_id = \
-                    job_id_pair.JobIdPair(job_id[0], other_job_id[0])
+                merged_job_id = job_id_pair.JobIdPair(job_id[0], other_job_id[0])
                 converted_allocation[merged_job_id] = {}
                 for worker_type in worker_types:
-                    current_job_type_allocation = \
-                        job_type_allocation[worker_type][job_type_key][other_job_type_key]
+                    current_job_type_allocation = job_type_allocation[worker_type][
+                        job_type_key
+                    ][other_job_type_key]
                     if current_job_type_allocation > 0.0:
                         if job_type_key == other_job_type_key:
-                            current_job_type_allocation -= \
-                                allocation[job_id][worker_type][job_type_key]
-                        converted_allocation[merged_job_id][worker_type] = \
-                            (allocation[job_id][worker_type][other_job_type_key] *\
-                             allocation[other_job_id][worker_type][job_type_key] /\
-                             current_job_type_allocation)
+                            current_job_type_allocation -= allocation[job_id][
+                                worker_type
+                            ][job_type_key]
+                        converted_allocation[merged_job_id][worker_type] = (
+                            allocation[job_id][worker_type][other_job_type_key]
+                            * allocation[other_job_id][worker_type][job_type_key]
+                            / current_job_type_allocation
+                        )
                     else:
                         converted_allocation[merged_job_id][worker_type] = 0.0
 

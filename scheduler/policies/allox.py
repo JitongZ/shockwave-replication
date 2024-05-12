@@ -1,4 +1,5 @@
 import os, sys
+
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 import copy
@@ -8,26 +9,31 @@ from scipy.optimize import linear_sum_assignment
 
 from policy import Policy, PolicyWithPacking
 
+
 class AlloXPolicy(Policy):
     def __init__(self, alpha=1.0):
-        self._name = 'AlloX_Perf'
+        self._name = "AlloX_Perf"
         self._alpha = alpha
         self._prev_allocation = {}
 
-    def get_allocation(self, unflattened_throughputs,
-                       scale_factors, times_since_start,
-                       num_steps_remaining,
-                       cluster_spec):
-        throughputs, index = super().flatten(unflattened_throughputs,
-                                             cluster_spec)
-        if throughputs is None: return None
+    def get_allocation(
+        self,
+        unflattened_throughputs,
+        scale_factors,
+        times_since_start,
+        num_steps_remaining,
+        cluster_spec,
+    ):
+        throughputs, index = super().flatten(unflattened_throughputs, cluster_spec)
+        if throughputs is None:
+            return None
         (m, n) = throughputs.shape
         (job_ids, worker_types) = index
 
         # Make sure all scale factors are 1, since AlloX only supports jobs
         # with scale factors of 1.
         for job_id in scale_factors:
-            assert(scale_factors[job_id] == 1)
+            assert scale_factors[job_id] == 1
 
         # m is the number of jobs, n is the total number of available workers
         # (not the total number of worker types).
@@ -53,13 +59,13 @@ class AlloXPolicy(Policy):
             for already_allocated_job_id in already_allocated_job_ids:
                 if self._prev_allocation[already_allocated_job_id][worker_type] == 1.0:
                     num_workers -= 1
-            for worker_id in range(n, n+num_workers):
+            for worker_id in range(n, n + num_workers):
                 worker_id_to_worker_type_mapping[worker_id] = worker_type
                 n += 1
 
         # Sort job IDs according to arrival time.
         unallocated_job_ids.sort(key=lambda x: -times_since_start[x])
-        unallocated_job_ids = unallocated_job_ids[:max(int(self._alpha * m), n)]
+        unallocated_job_ids = unallocated_job_ids[: max(int(self._alpha * m), n)]
         m = len(unallocated_job_ids)
 
         # Construct matrix of processing times for each job on each worker,
@@ -68,14 +74,15 @@ class AlloXPolicy(Policy):
         for i in range(m):
             for j in range(n):
                 worker_type = worker_id_to_worker_type_mapping[j]
-                throughput = unflattened_throughputs[unallocated_job_ids[i]][worker_type]
+                throughput = unflattened_throughputs[unallocated_job_ids[i]][
+                    worker_type
+                ]
                 if throughput == 0.0:
                     throughput = 1e-10
-                q_base[i, j] = num_steps_remaining[unallocated_job_ids[i]] / \
-                    throughput
+                q_base[i, j] = num_steps_remaining[unallocated_job_ids[i]] / throughput
         # q is computed as [q_base q_base*2 q_base*3 ... q_base*n].
         q = np.copy(q_base)
-        for i in range(2, m+1):
+        for i in range(2, m + 1):
             scaled_q_base = i * q_base
             q = np.concatenate((q, scaled_q_base), axis=1)
 
@@ -86,7 +93,7 @@ class AlloXPolicy(Policy):
                 d_base[i, j] = times_since_start[unallocated_job_ids[i]]
         # d is computed as [d_base d_base d_base ... d_base].
         d = np.copy(d_base)
-        for i in range(2, m+1):
+        for i in range(2, m + 1):
             d = np.concatenate((d, d_base), axis=1)
 
         # Add d to q.
@@ -97,7 +104,7 @@ class AlloXPolicy(Policy):
 
         # Extract assignment of jobs to worker types.
         per_worker_id_job_assignment = {i: [] for i in range(n)}
-        for (row_index, col_index) in zip(row_indices, col_indices):
+        for row_index, col_index in zip(row_indices, col_indices):
             job_id = unallocated_job_ids[row_index]
             worker_id = col_index % n
             worker_type = worker_id_to_worker_type_mapping[worker_id]
@@ -105,8 +112,9 @@ class AlloXPolicy(Policy):
             per_worker_id_job_assignment[worker_id].append((job_id, worker_type_order))
         for worker_id in range(n):
             per_worker_id_job_assignment[worker_id] = [
-                (x[0], len(per_worker_id_job_assignment[worker_id]) -1 - x[1])
-                for x in per_worker_id_job_assignment[worker_id]]
+                (x[0], len(per_worker_id_job_assignment[worker_id]) - 1 - x[1])
+                for x in per_worker_id_job_assignment[worker_id]
+            ]
             per_worker_id_job_assignment[worker_id].sort(key=lambda x: x[1])
 
         # Construct allocation. Don't remember allocations beyond the first
@@ -115,8 +123,7 @@ class AlloXPolicy(Policy):
         # allocations have already been computed.
         allocation = {}
         for job_id in job_ids:
-            allocation[job_id] = \
-                {worker_type: 0.0 for worker_type in cluster_spec}
+            allocation[job_id] = {worker_type: 0.0 for worker_type in cluster_spec}
         for job_id in job_ids:
             if job_id in self._prev_allocation:
                 allocation[job_id] = copy.copy(self._prev_allocation[job_id])

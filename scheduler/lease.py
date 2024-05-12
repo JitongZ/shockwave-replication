@@ -4,8 +4,7 @@ class Lease:
         self._max_duration = max_duration
 
     def __str__(self):
-        return 'max_steps: %d, max_duration: %f' % (self._max_steps,
-                                                    self._max_duration)
+        return "max_steps: %d, max_duration: %f" % (self._max_steps, self._max_duration)
 
     @property
     def max_steps(self):
