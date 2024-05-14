@@ -1,0 +1,648 @@
+scheduler:INFO [0] Running scheduler in simulation with the following args: policy=MaxMinFairness, seed=0, time_per_iteration=120, profiling_percentage=1.0, num_reference_models=26
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 0
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 1
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 2
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 3
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 4
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 5
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 6
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 7
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 8
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 9
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 10
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 11
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 12
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 13
+scheduler:INFO [0.0] [Job dispatched]	Job ID: 14
+scheduler:DEBUG [0.0] Resetting time run so far
+/home/cs144/miniconda3/envs/gavel/lib/python3.8/site-packages/cvxpy/reductions/solvers/solving_chain.py:354: FutureWarning: 
+    You specified your problem should be solved by ECOS. Starting in
+    CXVPY 1.6.0, ECOS will no longer be installed by default with CVXPY.
+    Please either add an explicit dependency on ECOS or switch to our new
+    default solver, Clarabel, by either not specifying a solver argument
+    or specifying ``solver=cp.CLARABEL``.
+    
+  warnings.warn(ECOS_DEP_DEPRECATION_MSG, FutureWarning)
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 9	Worker type: v100	Worker ID(s): 2,3	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 11	Worker type: v100	Worker ID(s): 4,5	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [0.0] 46 GPUs of type v100 left unused. Number of active jobs: 15
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 9	Worker type: v100	Worker ID(s): [2, 3]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 11	Worker type: v100	Worker ID(s): [4, 5]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [119.99952626793122] Current active completion events: dict_keys([])
+scheduler:INFO [119.99952626793122] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 11	Worker type: v100	Worker ID(s): 4,5	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 9	Worker type: v100	Worker ID(s): 2,3	Priority: 12.66	Deficit: 0.00	Allocation:  [v100 0.84]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 15.02	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [119.99952626793122] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 15.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [119.99952626793122] 46 GPUs of type v100 left unused. Number of active jobs: 15
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 11	Worker type: v100	Worker ID(s): [4, 5]
+scheduler:INFO [239.99712349596197] [Job succeeded]	Job ID: 11	Start timestamp: 0.00	End timestamp: 164.25	Duration: 164.25
+scheduler:INFO [239.99712349596197] Remaining active jobs: 14
+scheduler:DEBUG [239.99712349596197] Current active completion events: dict_keys([])
+scheduler:INFO [239.99712349596197] [Micro-task succeeded]	Job ID: 9	Worker type: v100	Worker ID(s): [2, 3]
+scheduler:INFO [239.99712349596197] [Job succeeded]	Job ID: 9	Start timestamp: 0.00	End timestamp: 159.52	Duration: 159.52
+scheduler:INFO [239.99712349596197] Remaining active jobs: 13
+scheduler:DEBUG [239.99712349596197] Resetting time run so far
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 10.81	Deficit: -37.33	Allocation:  [v100 0.83]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 13.00	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 13.00	Deficit: 0.17	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 13.00	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 13.00	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 13.00	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 13.00	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 13.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [239.99712349596197] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 13.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [239.99712349596197] 50 GPUs of type v100 left unused. Number of active jobs: 13
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [359.9947207239927] Current active completion events: dict_keys([])
+scheduler:INFO [359.9947207239927] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 10.81	Deficit: -37.33	Allocation:  [v100 0.83]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 13.02	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 13.00	Deficit: 0.17	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 13.00	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 13.00	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 13.00	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 13.00	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 13.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [359.9947207239927] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 13.00	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [359.9947207239927] 50 GPUs of type v100 left unused. Number of active jobs: 13
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [479.9923179520235] Current active completion events: dict_keys([])
+scheduler:INFO [479.9923179520235] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 10.81	Deficit: -37.33	Allocation:  [v100 0.83]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 13.02	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 13.00	Deficit: 0.17	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 13.00	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 13.00	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 13.00	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 13.00	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 13.00	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 12.99	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [479.9923179520235] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 12.99	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [479.9923179520235] 50 GPUs of type v100 left unused. Number of active jobs: 13
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [599.9899151800543] Current active completion events: dict_keys([])
+scheduler:INFO [599.9899151800543] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 10.81	Deficit: -37.33	Allocation:  [v100 0.83]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 13.03	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 13.00	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 7	Priority: 13.00	Deficit: 0.17	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 13.00	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 13.00	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 13.00	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 13.00	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 12.99	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 12.99	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 12.99	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [599.9899151800543] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 12.99	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [599.9899151800543] 50 GPUs of type v100 left unused. Number of active jobs: 13
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [719.987512408085] Current active completion events: dict_keys([])
+scheduler:INFO [719.987512408085] [Micro-task succeeded]	Job ID: 0	Worker type: v100	Worker ID(s): [7]
+scheduler:INFO [719.987512408085] [Job succeeded]	Job ID: 0	Start timestamp: 0.00	End timestamp: 667.34	Duration: 667.34
+scheduler:INFO [719.987512408085] Remaining active jobs: 12
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 1	Worker type: v100	Worker ID(s): 0,1	Priority: 10.73	Deficit: -37.33	Allocation:  [v100 0.83]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 12.93	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 12.91	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 12.91	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 12.90	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 12.90	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 12.90	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 12.90	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 12.90	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 12.90	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 12.90	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [719.987512408085] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 12.90	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [719.987512408085] 51 GPUs of type v100 left unused. Number of active jobs: 12
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [839.9851096361157] Current active completion events: dict_keys([])
+scheduler:INFO [839.9851096361157] [Micro-task succeeded]	Job ID: 1	Worker type: v100	Worker ID(s): [0, 1]
+scheduler:INFO [839.9851096361157] [Job succeeded]	Job ID: 1	Start timestamp: 0.00	End timestamp: 777.71	Duration: 777.71
+scheduler:INFO [839.9851096361157] Remaining active jobs: 11
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 12.67	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 12.65	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 12.65	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 12.64	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 12.64	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 12.64	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 12.64	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 12.64	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 12.64	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 12.64	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:INFO [839.9851096361157] [Micro-task scheduled]	Job ID: 5	Worker type: v100	Worker ID(s): 11	Priority: 12.64	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [839.9851096361157] 53 GPUs of type v100 left unused. Number of active jobs: 11
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [959.9821213451687] Current active completion events: dict_keys([])
+scheduler:INFO [959.9821213451687] [Micro-task succeeded]	Job ID: 5	Worker type: v100	Worker ID(s): [11]
+scheduler:INFO [959.9821213451687] [Job succeeded]	Job ID: 5	Start timestamp: 0.00	End timestamp: 900.00	Duration: 900.00
+scheduler:INFO [959.9821213451687] Remaining active jobs: 10
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 12.34	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 4	Worker type: v100	Worker ID(s): 10	Priority: 12.32	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 12.32	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 12.31	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 12.31	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 12.31	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 12.31	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 12.31	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 12.31	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [959.9821213451687] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 12.31	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [959.9821213451687] 54 GPUs of type v100 left unused. Number of active jobs: 10
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [1079.9791330542216] Current active completion events: dict_keys([])
+scheduler:INFO [1079.9791330542216] [Micro-task succeeded]	Job ID: 4	Worker type: v100	Worker ID(s): [10]
+scheduler:INFO [1079.9791330542216] [Job succeeded]	Job ID: 4	Start timestamp: 0.00	End timestamp: 982.20	Duration: 982.20
+scheduler:INFO [1079.9791330542216] Remaining active jobs: 9
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 11.92	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 11.90	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 11.90	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 11.89	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 11.89	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 11.89	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 11.89	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 11.89	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1079.9791330542216] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 11.89	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [1079.9791330542216] 55 GPUs of type v100 left unused. Number of active jobs: 9
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [1199.9761447632745] Current active completion events: dict_keys([])
+scheduler:INFO [1199.9761447632745] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 11.58	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 11.56	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 12	Worker type: v100	Worker ID(s): 16	Priority: 11.56	Deficit: 0.12	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 11.55	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 11.55	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 14	Worker type: v100	Worker ID(s): 6	Priority: 11.55	Deficit: 0.02	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 11.55	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 11.55	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1199.9761447632745] [Micro-task scheduled]	Job ID: 6	Worker type: v100	Worker ID(s): 12	Priority: 11.55	Deficit: 0.00	Allocation:  [v100 1.00]
+scheduler:WARNING [1199.9761447632745] 55 GPUs of type v100 left unused. Number of active jobs: 9
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 12	Worker type: v100	Worker ID(s): [16]
+scheduler:INFO [1319.9683489039749] [Job succeeded]	Job ID: 12	Start timestamp: 0.00	End timestamp: 1279.51	Duration: 1279.51
+scheduler:INFO [1319.9683489039749] Remaining active jobs: 8
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 6	Worker type: v100	Worker ID(s): [12]
+scheduler:INFO [1319.9683489039749] [Job succeeded]	Job ID: 6	Start timestamp: 0.00	End timestamp: 1263.86	Duration: 1263.86
+scheduler:INFO [1319.9683489039749] Remaining active jobs: 7
+scheduler:DEBUG [1319.9683489039749] Current active completion events: dict_keys([])
+scheduler:INFO [1319.9683489039749] [Micro-task succeeded]	Job ID: 14	Worker type: v100	Worker ID(s): [6]
+scheduler:INFO [1319.9683489039749] [Job succeeded]	Job ID: 14	Start timestamp: 0.00	End timestamp: 1234.40	Duration: 1234.40
+scheduler:INFO [1319.9683489039749] Remaining active jobs: 6
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 11.15	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 10	Worker type: v100	Worker ID(s): 15	Priority: 11.13	Deficit: 0.19	Allocation:  [v100 1.00]
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 11.12	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 11.12	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 11.12	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1319.9683489039749] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 11.12	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:WARNING [1319.9683489039749] 58 GPUs of type v100 left unused. Number of active jobs: 6
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [1439.9605530446752] Current active completion events: dict_keys([])
+scheduler:INFO [1439.9605530446752] [Micro-task succeeded]	Job ID: 10	Worker type: v100	Worker ID(s): [15]
+scheduler:INFO [1439.9605530446752] [Job succeeded]	Job ID: 10	Start timestamp: 0.00	End timestamp: 1424.08	Duration: 1424.08
+scheduler:INFO [1439.9605530446752] Remaining active jobs: 5
+scheduler:INFO [1439.9605530446752] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 10.65	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1439.9605530446752] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 10.62	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1439.9605530446752] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 10.62	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1439.9605530446752] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 10.62	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1439.9605530446752] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 10.62	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:WARNING [1439.9605530446752] 59 GPUs of type v100 left unused. Number of active jobs: 5
+scheduler:DEBUG [1559.9527571853755] Current active completion events: dict_keys([])
+scheduler:INFO [1559.9527571853755] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1559.9527571853755] Current active completion events: dict_keys([])
+scheduler:INFO [1559.9527571853755] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:DEBUG [1559.9527571853755] Current active completion events: dict_keys([])
+scheduler:INFO [1559.9527571853755] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1559.9527571853755] Current active completion events: dict_keys([])
+scheduler:INFO [1559.9527571853755] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1559.9527571853755] Current active completion events: dict_keys([])
+scheduler:INFO [1559.9527571853755] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [1559.9527571853755] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 10.16	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1559.9527571853755] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 10.13	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1559.9527571853755] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 10.13	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1559.9527571853755] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 10.13	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:INFO [1559.9527571853755] [Micro-task scheduled]	Job ID: 8	Worker type: v100	Worker ID(s): 14	Priority: 10.13	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:WARNING [1559.9527571853755] 59 GPUs of type v100 left unused. Number of active jobs: 5
+scheduler:DEBUG [1679.9449613260758] Current active completion events: dict_keys([])
+scheduler:INFO [1679.9449613260758] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:DEBUG [1679.9449613260758] Current active completion events: dict_keys([])
+scheduler:INFO [1679.9449613260758] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1679.9449613260758] Current active completion events: dict_keys([])
+scheduler:INFO [1679.9449613260758] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:DEBUG [1679.9449613260758] Current active completion events: dict_keys([])
+scheduler:INFO [1679.9449613260758] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [1679.9449613260758] Current active completion events: dict_keys([])
+scheduler:INFO [1679.9449613260758] [Micro-task succeeded]	Job ID: 8	Worker type: v100	Worker ID(s): [14]
+scheduler:INFO [1679.9449613260758] [Job succeeded]	Job ID: 8	Start timestamp: 0.00	End timestamp: 1610.55	Duration: 1610.55
+scheduler:INFO [1679.9449613260758] Remaining active jobs: 4
+scheduler:INFO [1679.9449613260758] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 9.70	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1679.9449613260758] [Micro-task scheduled]	Job ID: 13	Worker type: v100	Worker ID(s): 17	Priority: 9.68	Deficit: 0.06	Allocation:  [v100 1.00]
+scheduler:INFO [1679.9449613260758] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 9.68	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:INFO [1679.9449613260758] [Micro-task scheduled]	Job ID: 7	Worker type: v100	Worker ID(s): 13	Priority: 9.68	Deficit: 0.01	Allocation:  [v100 1.00]
+scheduler:WARNING [1679.9449613260758] 60 GPUs of type v100 left unused. Number of active jobs: 4
+scheduler:DEBUG [1799.9233581567455] Current active completion events: dict_keys([])
+scheduler:INFO [1799.9233581567455] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1799.9233581567455] Current active completion events: dict_keys([])
+scheduler:INFO [1799.9233581567455] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [1799.9233581567455] Current active completion events: dict_keys([])
+scheduler:INFO [1799.9233581567455] [Micro-task succeeded]	Job ID: 7	Worker type: v100	Worker ID(s): [13]
+scheduler:INFO [1799.9233581567455] [Job succeeded]	Job ID: 7	Start timestamp: 0.00	End timestamp: 1752.66	Duration: 1752.66
+scheduler:INFO [1799.9233581567455] Remaining active jobs: 3
+scheduler:DEBUG [1799.9233581567455] Current active completion events: dict_keys([])
+scheduler:INFO [1799.9233581567455] [Micro-task succeeded]	Job ID: 13	Worker type: v100	Worker ID(s): [17]
+scheduler:INFO [1799.9233581567455] [Job succeeded]	Job ID: 13	Start timestamp: 0.00	End timestamp: 1723.32	Duration: 1723.32
+scheduler:INFO [1799.9233581567455] Remaining active jobs: 2
+scheduler:INFO [1799.9233581567455] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 9.20	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1799.9233581567455] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 9.18	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:WARNING [1799.9233581567455] 62 GPUs of type v100 left unused. Number of active jobs: 2
+scheduler:DEBUG [1919.9017549874152] Current active completion events: dict_keys([])
+scheduler:INFO [1919.9017549874152] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:DEBUG [1919.9017549874152] Current active completion events: dict_keys([])
+scheduler:INFO [1919.9017549874152] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [1919.9017549874152] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 8.71	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:INFO [1919.9017549874152] [Micro-task scheduled]	Job ID: 2	Worker type: v100	Worker ID(s): 8	Priority: 8.68	Deficit: 0.04	Allocation:  [v100 1.00]
+scheduler:WARNING [1919.9017549874152] 62 GPUs of type v100 left unused. Number of active jobs: 2
+scheduler:DEBUG [2039.5564302844496] Current active completion events: dict_keys([])
+scheduler:INFO [2039.5564302844496] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [2039.5564302844496] Current active completion events: dict_keys([])
+scheduler:INFO [2039.5564302844496] [Micro-task succeeded]	Job ID: 2	Worker type: v100	Worker ID(s): [8]
+scheduler:INFO [2039.5564302844496] [Job succeeded]	Job ID: 2	Start timestamp: 0.00	End timestamp: 2002.48	Duration: 2002.48
+scheduler:INFO [2039.5564302844496] Remaining active jobs: 1
+scheduler:INFO [2039.5564302844496] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 8.25	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:WARNING [2039.5564302844496] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2159.211105581484] Current active completion events: dict_keys([])
+scheduler:INFO [2159.211105581484] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2159.211105581484] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 7.81	Deficit: 0.69	Allocation:  [v100 1.00]
+scheduler:WARNING [2159.211105581484] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2278.8657808785183] Current active completion events: dict_keys([])
+scheduler:INFO [2278.8657808785183] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:DEBUG [2278.8657808785183] Resetting time run so far
+scheduler:INFO [2278.8657808785183] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2278.8657808785183] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2398.5204561755527] Current active completion events: dict_keys([])
+scheduler:INFO [2398.5204561755527] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2398.5204561755527] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2398.5204561755527] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2518.175131472587] Current active completion events: dict_keys([])
+scheduler:INFO [2518.175131472587] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2518.175131472587] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2518.175131472587] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2637.8298067696214] Current active completion events: dict_keys([])
+scheduler:INFO [2637.8298067696214] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2637.8298067696214] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2637.8298067696214] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2757.484482066656] Current active completion events: dict_keys([])
+scheduler:INFO [2757.484482066656] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2757.484482066656] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2757.484482066656] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2877.13915736369] Current active completion events: dict_keys([])
+scheduler:INFO [2877.13915736369] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2877.13915736369] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2877.13915736369] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [2996.7938326607245] Current active completion events: dict_keys([])
+scheduler:INFO [2996.7938326607245] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [2996.7938326607245] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [2996.7938326607245] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3116.448507957759] Current active completion events: dict_keys([])
+scheduler:INFO [3116.448507957759] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3116.448507957759] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3116.448507957759] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3236.1031832547933] Current active completion events: dict_keys([])
+scheduler:INFO [3236.1031832547933] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3236.1031832547933] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3236.1031832547933] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3355.7578585518277] Current active completion events: dict_keys([])
+scheduler:INFO [3355.7578585518277] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3355.7578585518277] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3355.7578585518277] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3475.412533848862] Current active completion events: dict_keys([])
+scheduler:INFO [3475.412533848862] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3475.412533848862] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3475.412533848862] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3595.0672091458964] Current active completion events: dict_keys([])
+scheduler:INFO [3595.0672091458964] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3595.0672091458964] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3595.0672091458964] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3714.721884442931] Current active completion events: dict_keys([])
+scheduler:INFO [3714.721884442931] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3714.721884442931] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3714.721884442931] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3834.376559739965] Current active completion events: dict_keys([])
+scheduler:INFO [3834.376559739965] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3834.376559739965] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3834.376559739965] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [3954.0312350369995] Current active completion events: dict_keys([])
+scheduler:INFO [3954.0312350369995] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [3954.0312350369995] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [3954.0312350369995] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [4073.685910334034] Current active completion events: dict_keys([])
+scheduler:INFO [4073.685910334034] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [4073.685910334034] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [4073.685910334034] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [4193.340585631068] Current active completion events: dict_keys([])
+scheduler:INFO [4193.340585631068] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [4193.340585631068] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [4193.340585631068] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [4312.995260928103] Current active completion events: dict_keys([])
+scheduler:INFO [4312.995260928103] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [4312.995260928103] [Micro-task scheduled]	Job ID: 3	Worker type: v100	Worker ID(s): 9	Priority: 1.00	Deficit: 5.43	Allocation:  [v100 1.00]
+scheduler:WARNING [4312.995260928103] 63 GPUs of type v100 left unused. Number of active jobs: 1
+scheduler:DEBUG [4387.60347023096] Current active completion events: dict_keys([])
+scheduler:INFO [4387.60347023096] [Micro-task succeeded]	Job ID: 3	Worker type: v100	Worker ID(s): [9]
+scheduler:INFO [4387.60347023096] [Job succeeded]	Job ID: 3	Start timestamp: 0.00	End timestamp: 4387.60	Duration: 4387.60
+scheduler:INFO [4387.60347023096] Remaining active jobs: 0
+scheduler:DEBUG [4387.60347023096] Resetting time run so far
+scheduler:WARNING [4387.60347023096] 64 GPUs of type v100 left unused. Number of active jobs: 0
+Total duration: 4387.603 seconds (1.22 hours)
+Job completion times:
+Job 0: 667.343
+Job 1: 777.710
+Job 2: 2002.481
+Job 3: 4387.603
+Job 4: 982.200
+Job 5: 899.996
+Job 6: 1263.858
+Job 7: 1752.662
+Job 8: 1610.548
+Job 9: 159.523
+Job 10: 1424.079
+Job 11: 164.250
+Job 12: 1279.513
+Job 13: 1723.324
+Job 14: 1234.398
+Average job completion time: 1355.299 seconds (0.38 hours)
+Average job completion time (low priority): 1355.299 seconds (0.38 hours)
+Cluster utilization: 0.076
+Extended leases 100.00% of the time (162/162)
