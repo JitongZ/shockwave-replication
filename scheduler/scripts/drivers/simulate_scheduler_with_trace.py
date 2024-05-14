@@ -16,10 +16,17 @@ import policies
 import scheduler
 import utils
 
+# my imports
+import pickle
+
+# Get the directory containing the script
+root_dir = os.path.dirname(os.path.realpath(__file__))
+
 
 def main(args):
     jobs, arrival_times = utils.parse_trace(args.trace_file)
     policy = utils.get_policy(args.policy, solver=args.solver, seed=args.seed)
+    trace_name = os.path.splitext(os.path.basename(args.trace_file))[0]
 
     sched = scheduler.Scheduler(
         policy,
@@ -48,7 +55,7 @@ def main(args):
     else:
         jobs_to_complete = None
 
-    sched.simulate(
+    makespan = sched.simulate(
         cluster_spec,
         arrival_times,
         jobs,
@@ -58,10 +65,30 @@ def main(args):
         num_gpus_per_server=num_gpus_per_server,
         jobs_to_complete=jobs_to_complete,
     )
-    sched.get_average_jct(jobs_to_complete)
+    avg_jct = sched.get_average_jct(jobs_to_complete)
     sched.get_cluster_utilization()
     sched.get_num_lease_extensions()
     sched.shutdown()
+
+    pickle_object = {
+        "trace_file": args.trace_file,
+        "policy": args.policy,
+        "num_gpus": num_gpus[0],
+        "makespan": makespan,
+        "avg_jct": avg_jct,
+    }
+
+    if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
+        os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
+    with open(
+        os.path.join(
+            root_dir, 
+            args.pickle_output_dir,
+            f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
+        ),
+        "wb",
+    ) as f:
+        pickle.dump(pickle_object, f)
 
 
 if __name__ == "__main__":
@@ -137,5 +164,12 @@ if __name__ == "__main__":
         type=int,
         default=None,
         help="Measurement window end (job ID)",
+    )
+    # our additions
+    parser.add_argument(
+        "--pickle_output_dir",
+        type=str,
+        default="../../shockwave_replicate/results/pickle",
+        help="Path of the directory that stores the statistics of simluation in *.pickle format",
     )
     main(parser.parse_args())

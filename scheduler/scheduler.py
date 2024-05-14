@@ -1604,6 +1604,9 @@ class Scheduler:
             "(%.2f hours)" % (self._current_timestamp, self._current_timestamp / 3600.0)
         )
 
+        # return duration/makespan
+        return self._current_timestamp
+
     def _is_final_round(self):
         return (
             self._max_rounds is not None
