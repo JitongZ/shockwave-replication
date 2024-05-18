@@ -74,6 +74,8 @@ class Scheduler:
         expected_num_workers=None,
         minimum_time_between_allocation_resets=1920,
         max_rounds=None,
+        pickle_file=None,
+        shockwave_config=None,
     ):
 
         # Flag to control whether scheduler runs in simulation mode.

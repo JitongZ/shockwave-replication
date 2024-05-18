@@ -98,6 +98,10 @@ class Job:
     def duration(self):
         return self._duration
 
+    @duration.setter
+    def duration(self, duration):
+        self._duration = duration
+
     @property
     def scale_factor(self):
         return self._scale_factor

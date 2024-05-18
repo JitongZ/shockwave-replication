@@ -574,13 +574,13 @@ def parse_trace(trace_file):
                 needs_data_dir,
                 total_steps,
                 scale_factor,
-                mode,
+                mode,  # new
                 priority_weight,
                 SLO,
-                duration,
+                duration,  # new
                 arrival_time,
             ) = line.split("\t")
-            
+
             assert int(scale_factor) >= 1
             jobs.append(
                 Job(
@@ -594,6 +594,7 @@ def parse_trace(trace_file):
                     # duration=None,
                     duration=duration,
                     scale_factor=int(scale_factor),
+                    mode=mode,
                     priority_weight=float(priority_weight),
                     SLO=float(SLO),
                 )
