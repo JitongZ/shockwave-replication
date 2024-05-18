@@ -82,7 +82,7 @@ def main(args):
         os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
     with open(
         os.path.join(
-            root_dir, 
+            root_dir,
             args.pickle_output_dir,
             f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
         ),
