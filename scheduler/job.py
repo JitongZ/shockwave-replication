@@ -8,6 +8,7 @@ class Job:
         num_steps_arg,
         total_steps,
         duration,
+        mode="static",
         scale_factor=1,
         priority_weight=1,
         SLO=None,
@@ -21,6 +22,7 @@ class Job:
         self._num_steps_arg = num_steps_arg
         self._total_steps = total_steps
         self._duration = duration
+        self._mode = mode
         self._scale_factor = scale_factor
         self._priority_weight = priority_weight
         if SLO is not None and SLO < 0:
@@ -30,13 +32,14 @@ class Job:
 
     def __str__(self):
         SLO = -1 if self._SLO is None else self._SLO
-        return "%s\t%s\t%s\t%s\t%d\t%d\t%d\t%d\t%f" % (
+        return "%s\t%s\t%s\t%s\t%d\t%d\t%s\t%d\t%d\t%f" % (
             self._job_type,
             self._command,
             self._working_directory,
             self._num_steps_arg,
             self._needs_data_dir,
             self._total_steps,
+            self._mode,
             self._scale_factor,
             self._priority_weight,
             SLO,
@@ -55,6 +58,7 @@ class Job:
             job_proto.num_steps_arg,
             job_proto.num_steps,
             duration,
+            mode=job_proto.mode,
             needs_data_dir=job_proto.needs_data_dir,
         )
 
@@ -99,9 +103,47 @@ class Job:
         return self._scale_factor
 
     @property
+    def mode(self):
+        return self._mode
+
+    @property
     def priority_weight(self):
         return self._priority_weight
 
     @property
     def SLO(self):
         return self._SLO
+    
+    @property
+    def batch_size(self):
+        job_type = self._job_type
+        return int(job_type[job_type.rfind(" ") + 1 : -1])
+
+    @property
+    def model(self):
+        job_type = self._job_type
+        return job_type[: job_type.find(" ")]
+    
+    def update_bs(self, new_bs):
+        if (
+            "translation" not in self._command
+            and "imagenet" not in self._command
+        ):
+            new_command = (
+                self._command[: self._command.rfind(" ")] + f" {new_bs}"
+            )
+        else:
+            second_last_occurr = self._command[: self._command.rfind(" ")].rfind(" ")
+            last_space = self._command.rfind(" ")
+            new_command = (
+                self._command[:second_last_occurr]
+                + f" {new_bs}"
+                + self._command[last_space:]
+            )
+
+        new_job_type = (
+            self._job_type[: self._job_type.rfind(" ")] + f" {new_bs})"
+        )
+
+        self._command = new_command
+        self._job_type = new_job_type
