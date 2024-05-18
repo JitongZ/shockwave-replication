@@ -552,6 +552,20 @@ def parse_trace(trace_file):
     arrival_times = []
     with open(trace_file, "r") as f:
         for line in f:
+            # (
+            #     job_type,
+            #     command,
+            #     working_directory,
+            #     num_steps_arg,
+            #     needs_data_dir,
+            #     total_steps,
+            #     scale_factor,
+            #     priority_weight,
+            #     SLO,
+            #     arrival_time,
+            # ) = line.split("\t")
+
+            # for shockwave's trace
             (
                 job_type,
                 command,
@@ -560,10 +574,13 @@ def parse_trace(trace_file):
                 needs_data_dir,
                 total_steps,
                 scale_factor,
+                mode,
                 priority_weight,
                 SLO,
+                duration,
                 arrival_time,
             ) = line.split("\t")
+            
             assert int(scale_factor) >= 1
             jobs.append(
                 Job(
@@ -574,7 +591,8 @@ def parse_trace(trace_file):
                     needs_data_dir=bool(int(needs_data_dir)),
                     num_steps_arg=num_steps_arg,
                     total_steps=int(total_steps),
-                    duration=None,
+                    # duration=None,
+                    duration=duration,
                     scale_factor=int(scale_factor),
                     priority_weight=float(priority_weight),
                     SLO=float(SLO),
