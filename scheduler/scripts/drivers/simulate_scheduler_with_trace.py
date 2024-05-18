@@ -28,13 +28,14 @@ def main(args):
     policy = utils.get_policy(args.policy, solver=args.solver, seed=args.seed)
     trace_name = os.path.splitext(os.path.basename(args.trace_file))[0]
 
-    sched = scheduler.Scheduler(
-        policy,
-        throughputs_file=args.throughputs_file,
-        simulate=True,
-        seed=args.seed,
-        time_per_iteration=args.time_per_iteration,
-    )
+    trace_dir = os.path.dirname(args.trace_file)
+    pickle_file_path = os.path.join(trace_dir, f"{trace_name}.pickle")
+
+    with open(pickle_file_path, "rb") as trace_pickle_file:
+        trace_pickle = pickle.load(trace_pickle_file)
+        for job_id, job in enumerate(jobs):
+            # update job's duration due to dynamic adaptation for each job
+            job.duration = sum(trace_pickle[job_id]["duration_every_epoch"])
 
     num_gpus = args.cluster_spec.split(":")
     cluster_spec = {
@@ -55,6 +56,28 @@ def main(args):
     else:
         jobs_to_complete = None
 
+    if args.policy == "shockwave":
+        assert (
+            args.config
+        ), "A .json configuration file is needed when running the shockwave policy"
+        shockwave_config = json.load(open(args.config, "r"))
+        shockwave_config["time_per_iteration"] = args.time_per_iteration
+        shockwave_config["num_gpus"] = (
+            cluster_spec["v100"] * num_gpus_per_server["v100"]
+        )
+    else:
+        shockwave_config = None
+
+    sched = scheduler.Scheduler(
+        policy,
+        throughputs_file=args.throughputs_file,
+        simulate=True,
+        seed=args.seed,
+        time_per_iteration=args.time_per_iteration,
+        pickle_file=pickle_file_path,
+        shockwave_config=shockwave_config,
+    )
+
     makespan = sched.simulate(
         cluster_spec,
         arrival_times,
@@ -68,6 +91,9 @@ def main(args):
     avg_jct = sched.get_average_jct(jobs_to_complete)
     sched.get_cluster_utilization()
     sched.get_num_lease_extensions()
+
+    # TODO: Implement other metrics, namely worst finish time fairness (worst FTF) and Unfair Job Fraction
+    # Needs to implement those metrics in scheduler.py
     sched.shutdown()
 
     # temp trial for plotting

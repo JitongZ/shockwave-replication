@@ -1,4 +1,4 @@
-scheduler:INFO [0] Running scheduler in simulation with the following args: policy=MaxMinFairness, seed=0, time_per_iteration=120, profiling_percentage=1.0, num_reference_models=26
+scheduler:INFO [0] Running scheduler in simulation with the following args: policy=MaxMinFairness, seed=0, time_per_iteration=120, profiling_percentage=1.0, num_reference_models=21
 scheduler:INFO [0.0] [Job dispatched]	Job ID: 0
 scheduler:DEBUG [0.0] Resetting time run so far
 /home/cs144/miniconda3/envs/gavel/lib/python3.8/site-packages/cvxpy/reductions/solvers/solving_chain.py:354: FutureWarning: 
