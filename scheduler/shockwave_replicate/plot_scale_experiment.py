@@ -14,7 +14,7 @@ def load_data(pickle_dir, metrics_to_plot):
             filepath = os.path.join(pickle_dir, filename)
             with open(filepath, "rb") as file:
                 pickle_object = pickle.load(file)
-                num_gpus = pickle_object["num_gpus"]
+                num_gpus = int(pickle_object["num_gpus"])
                 policy = pickle_object["policy"]
                 # Initialize dictionary structure
                 if num_gpus not in data:
@@ -34,37 +34,47 @@ def load_data(pickle_dir, metrics_to_plot):
 def plot_data(data, metrics_to_plot, save_dir, metrics_names):
     num_gpus_list = sorted(data.keys())
     policies = sorted(set(policy for gpu in data.values() for policy in gpu.keys()))
-    colors = ["black", "grey"]  # Custom color scheme
+    colors = ["black", "grey", "red"]  # Ensure you have enough colors for all policies
 
     # Set up the figure and axes for the subplots
-    fig, axes = plt.subplots(
-        1, len(metrics_to_plot), figsize=(15, 5)
-    )  # One row of plots
+    fig, axes = plt.subplots(1, len(metrics_to_plot), figsize=(15, 5))  # One row of plots
+
+    # Define the width of each bar and the separation between groups of bars
+    bar_width = 0.8 / len(policies)  # Adjust bar width based on number of policies
+    offset = np.arange(len(num_gpus_list))  # Initial positions for each num_gpus
 
     # Create plots
     for j, metric in enumerate(metrics_to_plot):
         ax = axes[j]
-        bar_positions = np.arange(len(policies))
-        # Gather data for each policy and metric
-        for idx, policy in enumerate(policies):
-            values = (
-                np.mean(data[num_gpus_list[0]][policy][metric])
-                if metric in data[num_gpus_list[0]][policy]
-                else 0
-            )
-            ax.barh(
-                bar_positions[idx],
-                values,
-                color=colors[idx],
-                height=0.01,
-                align="center",
-                edgecolor="black",
-            )
+        
+        # Create a group of bar plots for each num_gpus
+        for idx, num_gpus in enumerate(num_gpus_list):
+            # Initialize a list to hold the positions for this group
+            group_positions = offset[idx] + np.arange(len(policies)) * bar_width
+            
+            # Plot a bar for each policy value
+            for k, policy in enumerate(policies):
+                values = np.mean(data[num_gpus][policy][metric]) if metric in data[num_gpus][policy] else 0
+                ax.barh(
+                    group_positions[k],
+                    values,
+                    color=colors[k % len(colors)],  # Cycle through colors
+                    height=bar_width,
+                    align='center',
+                    edgecolor='black'
+                )
+            
+            # Move the starting position of the next group so there's space between groups
+            offset[idx] += len(policies) * bar_width
 
         # Set labels, titles, ticks
-        # ax.set_xticks([])
         ax.set_xlabel(metrics_names[metric], fontsize=12, labelpad=10)
-        ax.set_yticks([])
+        tick_positions = offset + (len(policies) * bar_width / 2) - (bar_width / 2)
+        ax.set_yticks(tick_positions) # Adjust y-ticks to be in the middle of each group
+        # ax.set_yticks(offset - (len(policies) * bar_width / 2))  # Adjust y-ticks to be in the middle of groups
+        ax.set_yticklabels(num_gpus_list)
+        ytick_labels = [f"{num} GPUs" for num in num_gpus_list]  ###
+        ax.set_yticklabels(ytick_labels)
         ax.invert_yaxis()  # Invert to have the first entry at the top
         ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.7)
 

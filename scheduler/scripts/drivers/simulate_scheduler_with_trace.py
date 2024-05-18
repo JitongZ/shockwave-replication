@@ -70,6 +70,11 @@ def main(args):
     sched.get_num_lease_extensions()
     sched.shutdown()
 
+    # temp trial for plotting
+    # args.policy = "shockwave"
+    # num_gpus[0] = 128
+    # num_gpus[0] = 256
+
     pickle_object = {
         "trace_file": args.trace_file,
         "policy": args.policy,
