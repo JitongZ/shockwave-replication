@@ -18,7 +18,7 @@ def resnet18(batch_size):
 
 def resnet50(batch_size):
     model = "ResNet-50 (batch size %d)" % (batch_size)
-    command = "python3 main.py -j 8 -a resnet50 -b %d" % (batch_size)
+    command = "python3 main.py -j 4 -a resnet50 -b %d" % (batch_size)
     command += " %s/imagenet/"
     working_directory = "image_classification/imagenet"
     num_steps_arg = "--num_minibatches"
@@ -48,7 +48,7 @@ def transformer(batch_size):
 
 def lm(batch_size):
     model = "LM (batch size %d)" % (batch_size)
-    command = "python main.py --cuda --data %s/wikitext2"
+    command = "python3 main.py --cuda --data %s/wikitext2"
     command += " --batch_size %d" % (batch_size)
     working_directory = "language_modeling"
     num_steps_arg = "--steps"
@@ -76,8 +76,11 @@ def recommendation(batch_size):
 
 
 def a3c():
-    model = "A3C"
-    command = "python3 main.py --env PongDeterministic-v4 --workers 4 " "--amsgrad True"
+    model = "A3C (batch size 4)"
+    command = (
+        "python3 main.py --env PongDeterministic-v4 --workers 4 "
+        "--amsgrad True"
+    )
     working_directory = "rl"
     num_steps_arg = "--max-steps"
     return JobTemplate(
@@ -90,9 +93,11 @@ def a3c():
 
 
 def cyclegan():
-    model = "CycleGAN"
+    model = "CycleGAN (batch size 1)"
     working_directory = "cyclegan"
-    command = "python3 cyclegan.py --dataset_path %s/monet2photo" " --decay_epoch 0"
+    command = (
+        "python3 cyclegan.py --dataset_path %s/monet2photo" " --decay_epoch 0"
+    )
     num_steps_arg = "--n_steps"
     return JobTemplate(
         model=model,
@@ -104,15 +109,15 @@ def cyclegan():
 
 JobTable = []
 
-for batch_size in [16, 32, 64, 128, 256]:
+# for batch_size in [16, 32, 64, 128, 256]:
+for batch_size in [32, 64, 128, 256]:
     JobTable.append(resnet18(batch_size))
-for batch_size in [16, 32, 64, 128]:
+# for batch_size in [16, 32, 64, 128]:
+for batch_size in [16, 32, 64]:
     JobTable.append(resnet50(batch_size))
-for batch_size in [16, 32, 64, 128, 256]:
+for batch_size in [16, 32, 64, 128,]:  # do not generate transformer jobs with bs=256 to prevent oom on a 16-GB V100
     JobTable.append(transformer(batch_size))
 for batch_size in [5, 10, 20, 40, 80]:
     JobTable.append(lm(batch_size))
 for batch_size in [512, 1024, 2048, 4096, 8192]:
     JobTable.append(recommendation(batch_size))
-JobTable.append(a3c())
-JobTable.append(cyclegan())

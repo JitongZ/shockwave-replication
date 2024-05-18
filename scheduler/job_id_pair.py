@@ -2,7 +2,6 @@ import hashlib
 
 
 class JobIdPair:
-
     def __init__(self, job0, job1):
         if job0 is None and job1 is None:
             raise ValueError("Cannot form JobIdPair with both ids None")
@@ -60,6 +59,8 @@ class JobIdPair:
         return self._job0 < other._job0
 
     def __eq__(self, other):
+        if type(other) is int:
+            return self._job0 == other
         return self._job0 == other._job0 and self._job1 == other._job1
 
     def __hash__(self):
@@ -76,7 +77,9 @@ class JobIdPair:
 
     def overlaps_with(self, other):
         if self._is_pair:
-            raise ValueError("Can only call overlaps_with on a " "single job id")
+            raise ValueError(
+                "Can only call overlaps_with on a " "single job id"
+            )
         return self._job0 in other._as_set
 
     def is_pair(self):
@@ -84,3 +87,7 @@ class JobIdPair:
 
     def singletons(self):
         return self._singletons
+
+    def integer_job_id(self):
+        assert self._job1 is None
+        return int(self._job0)
