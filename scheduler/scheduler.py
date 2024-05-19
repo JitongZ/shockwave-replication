@@ -3371,6 +3371,10 @@ class Scheduler:
             else:
                 job_ids = [job_id[0], job_id[1]]
 
+            # accordion/gns: scale the batch size and num of iterations for current job(s)
+            for jobid in job_ids:
+                self._scale_bs_and_iters(jobid)
+
             for single_job_id in to_remove:
                 self._remove_job(single_job_id)
 
