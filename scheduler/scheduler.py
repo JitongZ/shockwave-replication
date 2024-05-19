@@ -29,6 +29,9 @@ from custom_logging import SchedulerAdapter
 from throughput_estimator import ThroughputEstimator
 import utils
 
+# shockwave imports
+import pickle
+
 """ Constants """
 # Port for scheduler server.
 SCHEDULER_PORT = 50060
@@ -331,6 +334,12 @@ class Scheduler:
         # Shockwave: maintains the mapping of job id - original batch size
         # key: job_id, value: int
         self._original_bs = {}
+        # Shockwave: record total number of jobs in trace
+        self._num_jobs_in_trace = 0
+        # Shockwave: read from pickle file that contains metadata of trace
+        with open(pickle_file, "rb") as f:
+            self._profiles = pickle.load(f)
+
         port = SCHEDULER_PORT
         callbacks = {
             "RegisterWorker": self._register_worker_callback,
@@ -536,6 +545,8 @@ class Scheduler:
             scale_factor = job.scale_factor
             job_type_key = (job_type, scale_factor)
             self._job_id_to_job_type[job_id] = job_type_key
+            # shockwave: increment total number of jobs in trace
+            self._num_jobs_in_trace += 1
             if self._estimate_throughputs:
                 self._reference_job_map[job_id] = (
                     self._throughput_estimator.match_job_to_reference_job(job_type_key)
@@ -3501,3 +3512,33 @@ class Scheduler:
 
             # reset the flags
             self._bs_scale[job_id] = None
+
+    """
+    Shockwave: Get finish time fairness (FTF) for every job
+    """
+
+    def get_finish_time_fairness(self):
+        """Computes the finish time fairness for each job
+        Args:
+        Returns;
+            finish_time_fairness_list: A list of finish time fairness
+            for all jobs in job_ids
+        """
+
+        num_gpus = len(self._worker_ids)
+        with self._scheduler_lock:
+            if len(self._job_completion_times) == 0:
+                return
+            job_ids = sorted(list(self._job_completion_times.keys()))
+            ftf_list = []
+            avg_contention_factor = max(1.0, self._num_jobs_in_trace / num_gpus)
+            for job_id in job_ids:
+                jct = self._job_completion_times[job_id]
+                if jct is None:
+                    continue
+                jct_if_isolated = sum(
+                    self._profiles[job_id.integer_job_id()]["duration_every_epoch"]
+                )
+                rho = round(jct / (jct_if_isolated * avg_contention_factor), 3)
+                ftf_list.append(rho)
+            return ftf_list
