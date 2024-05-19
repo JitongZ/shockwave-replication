@@ -1,14 +1,6 @@
 scheduler:INFO [0] Running scheduler in simulation with the following args: policy=MaxMinFairness, seed=0, time_per_iteration=120, profiling_percentage=1.0, num_reference_models=21
 scheduler:INFO [0.0] [Job dispatched]	Job ID: 0
 scheduler:DEBUG [0.0] Resetting time run so far
-/home/cs144/miniconda3/envs/gavel/lib/python3.8/site-packages/cvxpy/reductions/solvers/solving_chain.py:354: FutureWarning: 
-    You specified your problem should be solved by ECOS. Starting in
-    CXVPY 1.6.0, ECOS will no longer be installed by default with CVXPY.
-    Please either add an explicit dependency on ECOS or switch to our new
-    default solver, Clarabel, by either not specifying a solver argument
-    or specifying ``solver=cp.CLARABEL``.
-    
-  warnings.warn(ECOS_DEP_DEPRECATION_MSG, FutureWarning)
 scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 0	Priority: 1.00	Deficit: 0.00	Allocation:  [v100 1.00]
 scheduler:WARNING [0.0] 63 GPUs of type v100 left unused. Number of active jobs: 1
 scheduler:DEBUG [119.94679996938959] Current active completion events: dict_keys([])

@@ -77,10 +77,7 @@ def recommendation(batch_size):
 
 def a3c():
     model = "A3C (batch size 4)"
-    command = (
-        "python3 main.py --env PongDeterministic-v4 --workers 4 "
-        "--amsgrad True"
-    )
+    command = "python3 main.py --env PongDeterministic-v4 --workers 4 " "--amsgrad True"
     working_directory = "rl"
     num_steps_arg = "--max-steps"
     return JobTemplate(
@@ -95,9 +92,7 @@ def a3c():
 def cyclegan():
     model = "CycleGAN (batch size 1)"
     working_directory = "cyclegan"
-    command = (
-        "python3 cyclegan.py --dataset_path %s/monet2photo" " --decay_epoch 0"
-    )
+    command = "python3 cyclegan.py --dataset_path %s/monet2photo" " --decay_epoch 0"
     num_steps_arg = "--n_steps"
     return JobTemplate(
         model=model,
@@ -115,7 +110,12 @@ for batch_size in [32, 64, 128, 256]:
 # for batch_size in [16, 32, 64, 128]:
 for batch_size in [16, 32, 64]:
     JobTable.append(resnet50(batch_size))
-for batch_size in [16, 32, 64, 128,]:  # do not generate transformer jobs with bs=256 to prevent oom on a 16-GB V100
+for batch_size in [
+    16,
+    32,
+    64,
+    128,
+]:  # do not generate transformer jobs with bs=256 to prevent oom on a 16-GB V100
     JobTable.append(transformer(batch_size))
 for batch_size in [5, 10, 20, 40, 80]:
     JobTable.append(lm(batch_size))

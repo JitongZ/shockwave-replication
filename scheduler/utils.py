@@ -684,6 +684,26 @@ def get_accordion_bs_pattern(job_type, initial_batch_size, num_epochs):
 
     return bs_every_epoch
 
+def get_accordion_in_critical_regime(model, original_batch_size, current_epoch):
+    if model == "LM":
+        in_critical_regime = current_epoch < 10
+    elif model == "Recommendation":
+        if original_batch_size in [512, 1024]:
+            in_critical_regime = current_epoch < 30
+        elif original_batch_size == 2048:
+            in_critical_regime = current_epoch < 40
+        elif original_batch_size in [4096, 8192]:
+            in_critical_regime = current_epoch < 10
+    elif model == "ResNet-50":
+        in_critical_regime = (current_epoch % 30) < 10
+    elif model == "ResNet-18":
+        head_cr_len = 20 if original_batch_size == 256 else 10
+        in_critical_regime = (
+            (0 <= current_epoch and current_epoch < head_cr_len)
+            or (150 <= current_epoch and current_epoch < 160)
+            or (250 <= current_epoch and current_epoch < 260)
+        )
+    return in_critical_regime
 
 def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
     """Takes in the specifications of a job, return the batch size

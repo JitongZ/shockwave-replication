@@ -20,7 +20,6 @@ import matrix_completion
 import warnings
 import logging
 
-# TODO: clean these up.
 from job import Job
 import job_id_pair
 from job_table import JobTable
@@ -53,11 +52,39 @@ JOB_COMPLETION_BUFFER_TIME = 60
 BASE_JOB_PORT = 60570
 # Maximum port number.
 MAX_PORT = 65535
+# Batch size scaling.
+BS_BIG = 0
+BS_SMALL = 1
+
+dataset_size_dict = {
+    "ResNet-18": 50000,  # cifar10
+    "ResNet-50": 100000,  # imagenet
+    "Transformer": 10000,  # multi30k
+    "LM": 59675,  # wikitext2
+    "Recommendation": 117907,  # ml-20m
+    "CycleGAN": 6287,  # monet2photo
+    "A3C": 4,  # no dataset
+}
+
+max_bs_dict = {
+    "ResNet-18": 256,
+    "ResNet-50": 128,
+    "Transformer": 128,
+    "LM": 80,
+    "Recommendation": 8192,
+}
+
+min_bs_dict = {
+    "ResNet-18": 16,
+    "ResNet-50": 16,
+    "Transformer": 16,
+    "LM": 5,
+    "Recommendation": 512,
+}
 
 
 class Scheduler:
 
-    # TODO: Make assign_SLOs a configurable parameter from scripts.
     def __init__(
         self,
         policy,
@@ -233,7 +260,6 @@ class Scheduler:
         self._throughputs = {}
         # Throughputs measured with respect to job types rather than
         # individual jobs.
-        # TODO: Use this to replace self._throughputs.
         self._job_type_throughputs = {}
         # Map from job ID to application.
         self._job_id_to_job_type = {}
@@ -299,7 +325,11 @@ class Scheduler:
         self._max_rounds = max_rounds
         # Number of completed rounds.
         self._num_completed_rounds = 0
-
+        # Shockwave: for each job, indicate if there is a pending resource requirement update request
+        self._bs_scale = {}
+        # Shockwave: maintains the mapping of job id - original batch size
+        # key: job_id, value: int
+        self._original_bs = {}
         port = SCHEDULER_PORT
         callbacks = {
             "RegisterWorker": self._register_worker_callback,
@@ -532,6 +562,7 @@ class Scheduler:
             self._per_job_latest_timestamps[job_id] = None
             self._add_to_priorities(job_id)
             self._need_to_update_allocation = True
+            self._bs_scale[job_id] = None
 
             if timestamp is None:
                 timestamp = self.get_current_timestamp()
@@ -626,8 +657,6 @@ class Scheduler:
                                 worker_type
                             ][job_type_key]
         self._remove_from_priorities(job_id)
-        # TODO: Add a flag to choose whether to update allocation here.
-        # NOTE: Scheduler cv will be notified by calling function.
         self._need_to_update_allocation = True
         self._logger.info("Remaining active jobs: {0}".format(len(self._jobs)))
 
@@ -667,7 +696,6 @@ class Scheduler:
                     rpc_client.shutdown()
         self._orig_logger.removeHandler(self._logging_handler)
         self._logging_handler.close()
-        # TODO: Any other cleanup?
 
     """
     ======================================================================
@@ -1193,6 +1221,66 @@ class Scheduler:
         return (
             -math.log(1.0 - self._interarrival_time_generator.random()) / rate_parameter
         )
+
+    # Simulate batch size scaling
+    def _simulate_gns(self, job_id):
+        with self._scheduler_lock:
+            model = self._jobs[job_id].model
+            job_type = self._jobs[job_id].job_type
+            batch_size = self._jobs[job_id].batch_size
+            original_batch_size = self._original_bs[job_id]
+            total_steps_run = self._total_steps_run[job_id]
+            current_epoch = self._get_num_epochs(model, batch_size, total_steps_run)
+            scale_factor = self._jobs[job_id].scale_factor
+            bs_gns = utils.get_gns_bs_pattern(
+                job_type,
+                original_batch_size,
+                max(760, current_epoch + 2),
+                scale_factor,
+            )
+
+            if (
+                bs_gns[current_epoch + 1] > batch_size
+                or bs_gns[current_epoch] > batch_size
+            ):
+                if (model, batch_size) not in max_bs_dict.items():
+                    self._logger.debug(
+                        f"[Job {job_id}] current epoch: {current_epoch}, doubling batch size in gns"
+                    )
+                    self._bs_scale[job_id] = BS_BIG
+
+            self._scheduler_cv.notifyAll()
+
+    def _simulate_accordion(self, job_id):
+        with self._scheduler_lock:
+            model = self._jobs[job_id].model
+            job_type = self._jobs[job_id].job_type
+            batch_size = self._jobs[job_id].batch_size
+            original_batch_size = self._original_bs[job_id]
+            # original_batch_size = self._jobs[job_id].original_bs
+            total_steps_run = self._total_steps_run[job_id]
+            current_epoch = self._get_num_epochs(model, batch_size, total_steps_run)
+
+            if model == "Transformer":
+                # Accordion cannot be applied to transformer jobs for now
+                return
+            in_critical_regime = utils.get_accordion_in_critical_regime(
+                model, original_batch_size, current_epoch
+            )
+
+            if batch_size == original_batch_size and not in_critical_regime:
+                if (model, batch_size) not in max_bs_dict.items():
+                    self._logger.debug(
+                        f"[Job {job_id}] current epoch: {current_epoch}, scaling up batch size"
+                    )
+                    self._bs_scale[job_id] = BS_BIG
+            elif batch_size != original_batch_size and in_critical_regime:
+                if (model, batch_size) not in min_bs_dict.items():
+                    self._logger.debug(
+                        f"[Job {job_id}] current epoch: {current_epoch}, scaling down batch size"
+                    )
+                    self._bs_scale[job_id] = BS_SMALL
+            self._scheduler_cv.notifyAll()
 
     def simulate(
         self,
@@ -2871,7 +2959,6 @@ class Scheduler:
         # Extend the lease if the job has been placed on the same workers
         # for the upcoming round.
         with self._scheduler_lock:
-            # TODO: Remove scan of self._jobs_with_extended_lease.
             for job_id_combination in self._jobs_with_extended_lease:
                 if job_id.overlaps_with(job_id_combination):
                     updated_lease_duration = duration
@@ -2902,7 +2989,6 @@ class Scheduler:
                         max_steps = self._max_steps[job_id]
                         if max_steps is not None:
                             break
-                    # TODO: Sleep for less time?
                     self._logger.debug(
                         "Job {0} (worker {1}) waiting for "
                         "lease...".format(job_id, worker_id)
@@ -3272,6 +3358,11 @@ class Scheduler:
                 job_id, worker_type, all_num_steps, all_execution_times
             )
 
+            if type(job_id) is int:
+                job_ids = [job_id]
+            else:
+                job_ids = [job_id[0], job_id[1]]
+
             for single_job_id in to_remove:
                 self._remove_job(single_job_id)
 
@@ -3282,4 +3373,119 @@ class Scheduler:
                     self._next_worker_assignments[job_id]
                 )
 
+            for job_id in job_ids:
+                if job_id is None:
+                    continue
+                if self._bs_scale[job_id] is not None:
+                    # ping the allocation thread to have it re-compute the allocation
+                    # to be used in the next round of scheduling
+                    self._need_to_update_allocation = True
+
+                self._bs_scale[job_id] = None
+
             self._scheduler_cv.notifyAll()
+
+    """
+    Scaling helper functions.
+    """
+
+    def _get_num_epochs(self, model, batch_size, num_steps):
+        """Takes in the specifications of a job, calculate and
+        return the number of total epochs
+        """
+        dataset_size = dataset_size_dict[model]
+        return math.ceil(num_steps / math.ceil(dataset_size / batch_size))
+
+    def _get_total_steps(self, model, batch_size, num_epochs):
+        """Takes in the specifications of a job, calculate and
+        return the number of total steps
+        """
+        dataset_size = dataset_size_dict[model]
+        return num_epochs * math.ceil(dataset_size / batch_size)
+
+    def _scale_bs_and_iters(self, job_id):
+        """
+        Scales up/down the batch size and number of iterations for a job.
+
+        Args:
+            job_id (int): ID of a single job
+        """
+        if job_id is None:
+            return
+        if self._bs_scale[job_id] is not None:
+            # update the batch size used in the job type
+            # and training command
+            assert self._oracle_throughputs is not None
+            assert type(job_id) is int or not job_id.is_pair()
+
+            # excerpt the old batch size
+            old_bs = self._jobs[job_id].batch_size
+            model = self._jobs[job_id].model
+            mode = self._jobs[job_id].mode
+            original_batch_size = self._original_bs[job_id]
+
+            if (model, original_batch_size) in max_bs_dict.items():
+                # oom/going beyond the gavel pre-profiled throughputs,
+                # no space for speedups due to batch size scaling
+                # reject the batch size update
+                self._bs_scale[job_id] = None
+                return
+            else:
+                if mode == "gns":
+                    # batch size strictly doubles up
+                    assert self._bs_scale[job_id] == BS_BIG
+                    new_bs = 2 * old_bs
+                elif mode == "accordion":
+                    if self._bs_scale[job_id] == BS_BIG:
+                        # scale bs to the maximum possible
+                        new_bs = max_bs_dict[model]
+                    else:
+                        # scale down to original/initial bs
+                        new_bs = original_batch_size
+                elif mode == "static":
+                    # no bs scaling, this is a failsafe mechanism
+                    new_bs = old_bs
+            self._jobs[job_id].update_bs(new_bs)
+
+            # update the throughput to make it reflect that of the new batch size
+            # the new throughput is read from the pre-profiled throughput file
+            for worker_type in self._worker_types:
+                scale_factor = self._jobs[job_id].scale_factor
+                new_job_type = self._jobs[job_id].job_type
+                key = (new_job_type, scale_factor)
+                if key not in self._oracle_throughputs[worker_type].keys():
+                    # fault tolerance: prevent jobs from asking for new batch sizes
+                    # that are not recorded in the throughput file
+                    self._logger.error(
+                        f"Reverting job {job_id} bs: {new_bs} -> {old_bs}"
+                    )
+                    self._bs_scale[job_id] = None
+                    self._jobs[job_id].update_bs(old_bs)  # Revert update_bs(new_bs)
+                    return
+
+                new_throughput = self._oracle_throughputs[worker_type][key]["null"]
+                self._throughputs[job_id][worker_type] = new_throughput
+
+            total_steps = self._jobs[job_id].total_steps
+            total_steps_run = self._total_steps_run[job_id]
+
+            # Preserve the number of epochs between batch size rescale.
+            old_total_epochs = self._get_num_epochs(model, old_bs, total_steps)
+            new_total_steps = math.ceil(total_steps * old_bs / new_bs)
+            new_total_epochs = self._get_num_epochs(model, new_bs, new_total_steps)
+            if new_total_epochs != old_total_epochs:
+                new_total_steps = self._get_total_steps(model, new_bs, old_total_epochs)
+
+            self._jobs[job_id].total_steps = new_total_steps
+
+            # also preserve the finished progress during rescaling
+            num_completed_epochs = self._get_num_epochs(model, old_bs, total_steps_run)
+            new_total_steps_run = self._get_total_steps(
+                model, new_bs, num_completed_epochs
+            )
+
+            self._total_steps_run[job_id] = new_total_steps_run
+            self._steps_run_so_far[job_id]["v100"] = new_total_steps_run
+
+            # reset the flags
+            self._bs_scale[job_id] = None
