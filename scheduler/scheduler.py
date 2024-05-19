@@ -530,6 +530,7 @@ class Scheduler:
             self._job_cost_so_far[job_id] = 0.0
             self._job_timelines[job_id] = [[] for _ in range(job.scale_factor)]
             self._throughputs[job_id] = {}
+            self._original_bs[job_id] = self._jobs[job_id].batch_size
             job_type = self._jobs[job_id].job_type
             scale_factor = job.scale_factor
             job_type_key = (job_type, scale_factor)
@@ -1509,6 +1510,12 @@ class Scheduler:
                     heapq.heappop(running_jobs)
                 else:
                     break
+
+            for single_job_id in self._jobs.keys():
+                if self._jobs[single_job_id].mode == "accordion":
+                    self._simulate_accordion(single_job_id)
+                elif self._jobs[single_job_id].mode == "gns":
+                    self._simulate_gns(single_job_id)
 
             # Since we're scheduling in rounds, no jobs should be
             # running when scheduling the next round of jobs.
