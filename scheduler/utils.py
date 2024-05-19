@@ -621,10 +621,13 @@ def print_allocation(allocation, current_time=None):
         print(allocation_str)
     print("=" * 80)
 
+
 """Adaptive batch_size pattern used by shockwave
 Adapted from shockwave's repo for consistency, since these functions are used
 to generate trace that will be used for testing.
 """
+
+
 def get_accordion_bs_pattern(job_type, initial_batch_size, num_epochs):
     """Takes in the specifications of a job, return the batch size
     pattern as a list after applying Accordion
@@ -669,13 +672,9 @@ def get_accordion_bs_pattern(job_type, initial_batch_size, num_epochs):
         "Recommendation": 8192,
     }
 
-    max_bs = (
-        max_bs_dict[model]
-        if model in max_bs_dict.keys()
-        else initial_batch_size
-    )
+    max_bs = max_bs_dict[model] if model in max_bs_dict.keys() else initial_batch_size
 
-    for (epoch, bs) in enumerate(bs_every_epoch):
+    for epoch, bs in enumerate(bs_every_epoch):
         # switch to large batch size when outside of critical regime
         # if epoch not in critical_regime:
         if (epoch not in critical_regime) and (epoch > num_epochs * 0.3):
@@ -683,6 +682,7 @@ def get_accordion_bs_pattern(job_type, initial_batch_size, num_epochs):
             bs_every_epoch[epoch] = max_bs
 
     return bs_every_epoch
+
 
 def get_accordion_in_critical_regime(model, original_batch_size, current_epoch):
     if model == "LM":
@@ -704,6 +704,7 @@ def get_accordion_in_critical_regime(model, original_batch_size, current_epoch):
             or (250 <= current_epoch and current_epoch < 260)
         )
     return in_critical_regime
+
 
 def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
     """Takes in the specifications of a job, return the batch size
@@ -971,12 +972,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
                 break
-    elif (
-        model == "LM"
-        and batch_size == 5
-        and scale_factor == 1
-        and num_epochs > 31
-    ):
+    elif model == "LM" and batch_size == 5 and scale_factor == 1 and num_epochs > 31:
         for epoch in range(31, 41):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -993,12 +989,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
-    elif (
-        model == "LM"
-        and batch_size == 10
-        and scale_factor == 1
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 10 and scale_factor == 1 and num_epochs > 11:
         for epoch in range(11, 21):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1011,12 +1002,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
-    elif (
-        model == "LM"
-        and batch_size == 20
-        and scale_factor == 1
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 20 and scale_factor == 1 and num_epochs > 11:
         for epoch in range(11, 41):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1025,22 +1011,12 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
-    elif (
-        model == "LM"
-        and batch_size == 40
-        and scale_factor == 1
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 40 and scale_factor == 1 and num_epochs > 11:
         for epoch in range(11, num_epochs):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
                 break
-    elif (
-        model == "LM"
-        and batch_size == 5
-        and scale_factor == 2
-        and num_epochs > 31
-    ):
+    elif model == "LM" and batch_size == 5 and scale_factor == 2 and num_epochs > 31:
         for epoch in range(31, 51):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1057,12 +1033,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
-    elif (
-        model == "LM"
-        and batch_size == 10
-        and scale_factor == 2
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 10 and scale_factor == 2 and num_epochs > 11:
         for epoch in range(11, 31):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1075,12 +1046,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
-    elif (
-        model == "LM"
-        and batch_size == 20
-        and scale_factor == 2
-        and num_epochs > 31
-    ):
+    elif model == "LM" and batch_size == 20 and scale_factor == 2 and num_epochs > 31:
         for epoch in range(31, 41):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1089,22 +1055,12 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
-    elif (
-        model == "LM"
-        and batch_size == 40
-        and scale_factor == 2
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 40 and scale_factor == 2 and num_epochs > 11:
         for epoch in range(11, num_epochs):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
                 break
-    elif (
-        model == "LM"
-        and batch_size == 5
-        and scale_factor == 4
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 5 and scale_factor == 4 and num_epochs > 11:
         for epoch in range(11, 31):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1121,12 +1077,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
-    elif (
-        model == "LM"
-        and batch_size == 10
-        and scale_factor == 4
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 10 and scale_factor == 4 and num_epochs > 11:
         for epoch in range(11, 31):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1139,12 +1090,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
-    elif (
-        model == "LM"
-        and batch_size == 20
-        and scale_factor == 4
-        and num_epochs > 11
-    ):
+    elif model == "LM" and batch_size == 20 and scale_factor == 4 and num_epochs > 11:
         for epoch in range(11, 61):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1153,12 +1099,7 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
             if epoch + 1 >= num_epochs:
                 break
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
-    elif (
-        model == "LM"
-        and batch_size == 40
-        and scale_factor == 4
-        and num_epochs > 61
-    ):
+    elif model == "LM" and batch_size == 40 and scale_factor == 4 and num_epochs > 61:
         for epoch in range(61, num_epochs):
             regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
             if epoch + 1 >= num_epochs:
@@ -1233,4 +1174,3 @@ def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
         if regular_mode_bs[epoch] > bs_limit[model]:
             regular_mode_bs[epoch] = bs_limit[model]
     return regular_mode_bs
-

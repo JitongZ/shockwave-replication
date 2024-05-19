@@ -56,6 +56,7 @@ MAX_PORT = 65535
 BS_BIG = 0
 BS_SMALL = 1
 
+# shockwave: dicts for batch size scaling
 dataset_size_dict = {
     "ResNet-18": 50000,  # cifar10
     "ResNet-50": 100000,  # imagenet
