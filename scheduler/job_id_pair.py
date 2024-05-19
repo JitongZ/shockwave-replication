@@ -77,9 +77,7 @@ class JobIdPair:
 
     def overlaps_with(self, other):
         if self._is_pair:
-            raise ValueError(
-                "Can only call overlaps_with on a " "single job id"
-            )
+            raise ValueError("Can only call overlaps_with on a " "single job id")
         return self._job0 in other._as_set
 
     def is_pair(self):

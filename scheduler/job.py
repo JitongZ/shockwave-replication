@@ -117,7 +117,7 @@ class Job:
     @property
     def SLO(self):
         return self._SLO
-    
+
     @property
     def batch_size(self):
         job_type = self._job_type
@@ -127,15 +127,10 @@ class Job:
     def model(self):
         job_type = self._job_type
         return job_type[: job_type.find(" ")]
-    
+
     def update_bs(self, new_bs):
-        if (
-            "translation" not in self._command
-            and "imagenet" not in self._command
-        ):
-            new_command = (
-                self._command[: self._command.rfind(" ")] + f" {new_bs}"
-            )
+        if "translation" not in self._command and "imagenet" not in self._command:
+            new_command = self._command[: self._command.rfind(" ")] + f" {new_bs}"
         else:
             second_last_occurr = self._command[: self._command.rfind(" ")].rfind(" ")
             last_space = self._command.rfind(" ")
@@ -145,9 +140,7 @@ class Job:
                 + self._command[last_space:]
             )
 
-        new_job_type = (
-            self._job_type[: self._job_type.rfind(" ")] + f" {new_bs})"
-        )
+        new_job_type = self._job_type[: self._job_type.rfind(" ")] + f" {new_bs})"
 
         self._command = new_command
         self._job_type = new_job_type

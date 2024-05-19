@@ -37,7 +37,9 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names):
     colors = ["black", "grey", "red"]  # Ensure you have enough colors for all policies
 
     # Set up the figure and axes for the subplots
-    fig, axes = plt.subplots(1, len(metrics_to_plot), figsize=(15, 5))  # One row of plots
+    fig, axes = plt.subplots(
+        1, len(metrics_to_plot), figsize=(15, 5)
+    )  # One row of plots
 
     # Define the width of each bar and the separation between groups of bars
     bar_width = 0.8 / len(policies)  # Adjust bar width based on number of policies
@@ -46,31 +48,37 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names):
     # Create plots
     for j, metric in enumerate(metrics_to_plot):
         ax = axes[j]
-        
+
         # Create a group of bar plots for each num_gpus
         for idx, num_gpus in enumerate(num_gpus_list):
             # Initialize a list to hold the positions for this group
             group_positions = offset[idx] + np.arange(len(policies)) * bar_width
-            
+
             # Plot a bar for each policy value
             for k, policy in enumerate(policies):
-                values = np.mean(data[num_gpus][policy][metric]) if metric in data[num_gpus][policy] else 0
+                values = (
+                    np.mean(data[num_gpus][policy][metric])
+                    if metric in data[num_gpus][policy]
+                    else 0
+                )
                 ax.barh(
                     group_positions[k],
                     values,
                     color=colors[k % len(colors)],  # Cycle through colors
                     height=bar_width,
-                    align='center',
-                    edgecolor='black'
+                    align="center",
+                    edgecolor="black",
                 )
-            
+
             # Move the starting position of the next group so there's space between groups
             offset[idx] += len(policies) * bar_width
 
         # Set labels, titles, ticks
         ax.set_xlabel(metrics_names[metric], fontsize=12, labelpad=10)
         tick_positions = offset + (len(policies) * bar_width / 2) - (bar_width / 2)
-        ax.set_yticks(tick_positions) # Adjust y-ticks to be in the middle of each group
+        ax.set_yticks(
+            tick_positions
+        )  # Adjust y-ticks to be in the middle of each group
         # ax.set_yticks(offset - (len(policies) * bar_width / 2))  # Adjust y-ticks to be in the middle of groups
         ax.set_yticklabels(num_gpus_list)
         ytick_labels = [f"{num} GPUs" for num in num_gpus_list]  ###
