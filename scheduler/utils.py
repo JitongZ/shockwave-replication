@@ -620,3 +620,597 @@ def print_allocation(allocation, current_time=None):
             allocation_str += " [%s: %f]" % (worker_type, value)
         print(allocation_str)
     print("=" * 80)
+
+"""Adaptive batch_size pattern used by shockwave
+Adapted from shockwave's repo for consistency, since these functions are used
+to generate trace that will be used for testing.
+"""
+def get_accordion_bs_pattern(job_type, initial_batch_size, num_epochs):
+    """Takes in the specifications of a job, return the batch size
+    pattern as a list after applying Accordion
+    """
+    model = job_type[: job_type.find(" ")]
+    bs_every_epoch = [initial_batch_size] * num_epochs
+
+    critical_regime = []
+
+    if model == "ResNet-18":
+        if initial_batch_size in [16, 32, 64, 128]:
+            regime = 10
+        elif initial_batch_size in [256]:
+            regime = 20
+        critical_regime = (
+            list(range(regime)) + list(range(150, 160)) + list(range(250, 260))
+        )
+    elif model == "ResNet-50":
+        if initial_batch_size in [16, 32, 64, 128]:
+            regime = 10
+        critical_regime = [x for x in range(600) if x % 30 < 10]
+    elif model == "LM":
+        regime = 10
+        critical_regime = list(range(regime))
+    elif model in ["Transformer", "CycleGAN", "A3C"]:
+        return bs_every_epoch
+    elif model == "Recommendation":
+        if initial_batch_size in [512, 1024]:
+            regime = 30
+        elif initial_batch_size in [2048]:
+            regime = 40
+        elif initial_batch_size in [4096, 8192]:
+            regime = 10
+        critical_regime = (
+            list(range(regime)) + list(range(60, 70)) + list(range(80, 90))
+        )
+
+    max_bs_dict = {  # max possible bs of jobs that support accordion bs scaling
+        "LM": 80,
+        "ResNet-18": 256,
+        "ResNet-50": 128,
+        "Recommendation": 8192,
+    }
+
+    max_bs = (
+        max_bs_dict[model]
+        if model in max_bs_dict.keys()
+        else initial_batch_size
+    )
+
+    for (epoch, bs) in enumerate(bs_every_epoch):
+        # switch to large batch size when outside of critical regime
+        # if epoch not in critical_regime:
+        if (epoch not in critical_regime) and (epoch > num_epochs * 0.3):
+            # force the first 30% of a job to be in critical regime to preserve accuracy
+            bs_every_epoch[epoch] = max_bs
+
+    return bs_every_epoch
+
+
+def get_gns_bs_pattern(job_type, batch_size, num_epochs, scale_factor):
+    """Takes in the specifications of a job, return the batch size
+    pattern as a list after applying GNS
+    """
+    # bs_limit = {"ResNet-18": 256,"ResNet-50": 128,"Transformer": 128,"LM": 80,"Recommendation": 8192}
+    model = job_type[: job_type.find(" ")]
+    # print("num_epochs are ",num_epochs)
+    regular_mode_bs = [batch_size] * num_epochs
+    # print(len(regular_mode_bs))
+    bs_limit = {
+        "ResNet-18": 256,
+        "ResNet-50": 128,
+        "Transformer": 128,
+        "LM": 80,
+        "Recommendation": 8192,
+    }
+    if (
+        model == "ResNet-18"
+        and batch_size == 16
+        and scale_factor == 1
+        and num_epochs > 31
+    ):
+        for epoch in range(31, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, 51):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(51, 71):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(71, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "ResNet-18"
+        and batch_size == 32
+        and scale_factor == 1
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 51):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(51, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "ResNet-18"
+        and batch_size == 64
+        and scale_factor == 1
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "ResNet-18"
+        and batch_size == 128
+        and scale_factor == 1
+        and num_epochs > 11
+    ):
+        for epoch in range(11, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "ResNet-18"
+        and batch_size == 16
+        and scale_factor == 2
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 91):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(91, 111):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(111, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "ResNet-18"
+        and batch_size == 32
+        and scale_factor == 2
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 21):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(21, 41):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "ResNet-18"
+        and batch_size == 64
+        and scale_factor == 2
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "ResNet-18"
+        and batch_size == 128
+        and scale_factor == 2
+        and num_epochs > 41
+    ):
+        for epoch in range(41, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "ResNet-18"
+        and batch_size == 16
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 21):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(21, 81):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(81, 91):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(91, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "ResNet-18"
+        and batch_size == 32
+        and scale_factor == 4
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 61):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(61, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "ResNet-18"
+        and batch_size == 64
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 61):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(61, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "ResNet-18"
+        and batch_size == 128
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "ResNet-50"
+        and batch_size == 64
+        and scale_factor == 1
+        and num_epochs > 101
+    ):
+        for epoch in range(101, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "ResNet-50"
+        and batch_size == 32
+        and scale_factor == 2
+        and num_epochs > 101
+    ):
+        for epoch in range(101, 111):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(111, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "ResNet-50"
+        and batch_size == 64
+        and scale_factor == 2
+        and num_epochs > 81
+    ):
+        for epoch in range(81, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "ResNet-50"
+        and batch_size == 32
+        and scale_factor == 4
+        and num_epochs > 131
+    ):
+        for epoch in range(131, 221):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(221, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "ResNet-50"
+        and batch_size == 64
+        and scale_factor == 4
+        and num_epochs > 191
+    ):
+        for epoch in range(191, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "LM"
+        and batch_size == 5
+        and scale_factor == 1
+        and num_epochs > 31
+    ):
+        for epoch in range(31, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, 61):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(61, 71):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(71, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "LM"
+        and batch_size == 10
+        and scale_factor == 1
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 21):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(21, 41):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "LM"
+        and batch_size == 20
+        and scale_factor == 1
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "LM"
+        and batch_size == 40
+        and scale_factor == 1
+        and num_epochs > 11
+    ):
+        for epoch in range(11, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "LM"
+        and batch_size == 5
+        and scale_factor == 2
+        and num_epochs > 31
+    ):
+        for epoch in range(31, 51):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(51, 61):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(61, 71):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(71, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "LM"
+        and batch_size == 10
+        and scale_factor == 2
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 41):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "LM"
+        and batch_size == 20
+        and scale_factor == 2
+        and num_epochs > 31
+    ):
+        for epoch in range(31, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "LM"
+        and batch_size == 40
+        and scale_factor == 2
+        and num_epochs > 11
+    ):
+        for epoch in range(11, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif (
+        model == "LM"
+        and batch_size == 5
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 71):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(71, 91):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(91, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "LM"
+        and batch_size == 10
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 31):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(31, 61):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(61, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "LM"
+        and batch_size == 20
+        and scale_factor == 4
+        and num_epochs > 11
+    ):
+        for epoch in range(11, 61):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(61, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "LM"
+        and batch_size == 40
+        and scale_factor == 4
+        and num_epochs > 61
+    ):
+        for epoch in range(61, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    elif model in ["Transformer", "CycleGAN", "A3C"]:
+        return regular_mode_bs
+    elif (
+        model == "Recommendation"
+        and batch_size == 512
+        and scale_factor == 1
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, 71):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(71, 91):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+        for epoch in range(91, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 16
+    elif (
+        model == "Recommendation"
+        and batch_size == 1024
+        and scale_factor == 1
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 51):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(51, 91):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+        for epoch in range(91, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 8
+    elif (
+        model == "Recommendation"
+        and batch_size == 2048
+        and scale_factor == 1
+        and num_epochs > 21
+    ):
+        for epoch in range(21, 41):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+        for epoch in range(41, num_epochs):
+            if epoch + 1 >= num_epochs:
+                break
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 4
+    elif (
+        model == "Recommendation"
+        and batch_size == 4096
+        and scale_factor == 1
+        and num_epochs > 41
+    ):
+        for epoch in range(41, num_epochs):
+            regular_mode_bs[epoch] = regular_mode_bs[epoch] * 2
+            if epoch + 1 >= num_epochs:
+                break
+    for epoch in range(0, num_epochs):
+        if regular_mode_bs[epoch] > bs_limit[model]:
+            regular_mode_bs[epoch] = bs_limit[model]
+    return regular_mode_bs
+
