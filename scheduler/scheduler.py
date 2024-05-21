@@ -3541,4 +3541,7 @@ class Scheduler:
                 )
                 rho = round(jct / (jct_if_isolated * avg_contention_factor), 3)
                 ftf_list.append(rho)
-            return ftf_list
+            
+            num_unfair_jobs = sum(ftf > 1.0 for ftf in ftf_list)
+            unfair_job_fraction = 100 * num_unfair_jobs / len(ftf_list)
+        return ftf_list, unfair_job_fraction

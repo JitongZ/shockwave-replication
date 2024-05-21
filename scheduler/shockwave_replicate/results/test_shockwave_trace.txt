@@ -1,6 +1,14 @@
 scheduler:INFO [0] Running scheduler in simulation with the following args: policy=MaxMinFairness, seed=0, time_per_iteration=120, profiling_percentage=1.0, num_reference_models=21
 scheduler:INFO [0.0] [Job dispatched]	Job ID: 0
 scheduler:DEBUG [0.0] Resetting time run so far
+/home/cs144/miniconda3/envs/gavel/lib/python3.8/site-packages/cvxpy/reductions/solvers/solving_chain.py:354: FutureWarning: 
+    You specified your problem should be solved by ECOS. Starting in
+    CXVPY 1.6.0, ECOS will no longer be installed by default with CVXPY.
+    Please either add an explicit dependency on ECOS or switch to our new
+    default solver, Clarabel, by either not specifying a solver argument
+    or specifying ``solver=cp.CLARABEL``.
+    
+  warnings.warn(ECOS_DEP_DEPRECATION_MSG, FutureWarning)
 scheduler:INFO [0.0] [Micro-task scheduled]	Job ID: 0	Worker type: v100	Worker ID(s): 0	Priority: 1.00	Deficit: 0.00	Allocation:  [v100 1.00]
 scheduler:WARNING [0.0] 63 GPUs of type v100 left unused. Number of active jobs: 1
 scheduler:DEBUG [119.94679996938959] Current active completion events: dict_keys([])
@@ -18789,13 +18797,13 @@ scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 169	Worker typ
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 116	Worker type: v100	Worker ID(s): 18,19	Priority: 28.44	Deficit: -700.08	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 32	Worker type: v100	Worker ID(s): 28,29	Priority: 28.44	Deficit: -713.45	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 37	Worker type: v100	Worker ID(s): 22,23	Priority: 28.44	Deficit: -715.03	Allocation:  [v100 0.75]
-scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 215	Worker type: v100	Worker ID(s): 16,17	Priority: 28.44	Deficit: -718.56	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 170	Worker type: v100	Worker ID(s): 30,31	Priority: 28.44	Deficit: -718.92	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 147	Worker type: v100	Worker ID(s): 20,21	Priority: 28.44	Deficit: -719.49	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 177	Worker type: v100	Worker ID(s): 34,35	Priority: 28.44	Deficit: -719.60	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 186	Worker type: v100	Worker ID(s): 36,37	Priority: 28.44	Deficit: -719.60	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 155	Worker type: v100	Worker ID(s): 26,27	Priority: 28.44	Deficit: -719.95	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 59	Worker type: v100	Worker ID(s): 38,39	Priority: 28.44	Deficit: -832.83	Allocation:  [v100 0.75]
+scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 215	Worker type: v100	Worker ID(s): 16,17	Priority: 28.44	Deficit: -718.56	Allocation:  [v100 0.75]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 159	Worker type: v100	Worker ID(s): 56	Priority: 38.00	Deficit: -317.73	Allocation:  [v100 1.00]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 84	Worker type: v100	Worker ID(s): 44	Priority: 38.00	Deficit: -401.02	Allocation:  [v100 1.00]
 scheduler:INFO [16438.87999226865] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 45	Priority: 38.00	Deficit: -401.02	Allocation:  [v100 1.00]
@@ -21566,11 +21574,11 @@ scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 76	Worker typ
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.83	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.82	Deficit: -664.02	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.82	Deficit: -634.60	Allocation:  [v100 1.00]
-scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.82	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.82	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.82	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.82	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.82	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.82	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20638.796730545044] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.82	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [20638.796730545044] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [20758.79439011329] Current active completion events: dict_keys([])
@@ -21624,11 +21632,11 @@ scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 76	Worker type
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.50	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.50	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.50	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.49	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.49	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.49	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.49	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.49	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.49	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20758.79439011329] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.49	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [20758.79439011329] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [20878.792049681535] Current active completion events: dict_keys([])
@@ -21682,11 +21690,11 @@ scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 76	Worker typ
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.36	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.36	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.35	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.35	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.35	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.35	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.35	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.35	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.35	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20878.792049681535] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.35	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [20878.792049681535] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [20998.78970924978] Current active completion events: dict_keys([])
@@ -21740,11 +21748,11 @@ scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 76	Worker type
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.28	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.28	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.28	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.27	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.27	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.27	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.27	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.27	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.27	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [20998.78970924978] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.27	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [20998.78970924978] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [21118.787368818026] Current active completion events: dict_keys([])
@@ -21798,11 +21806,11 @@ scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 76	Worker typ
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.24	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.23	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.23	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.22	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.22	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.22	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.22	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.22	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.22	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21118.787368818026] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.22	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21118.787368818026] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [21238.78502838627] Current active completion events: dict_keys([])
@@ -21856,11 +21864,11 @@ scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 76	Worker type
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.20	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.19	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.19	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.19	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.19	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.19	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.19	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.19	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.19	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21238.78502838627] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.19	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21238.78502838627] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [21358.782687954517] Current active completion events: dict_keys([])
@@ -21972,11 +21980,11 @@ scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 76	Worker typ
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 19.16	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 19.15	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 19.15	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.14	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 19.14	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 19.14	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 19.14	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 19.14	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 19.14	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21478.780347522763] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 19.14	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21478.780347522763] 22 GPUs of type v100 left unused. Number of active jobs: 19
 scheduler:DEBUG [21598.77800709101] Current active completion events: dict_keys([])
@@ -22032,11 +22040,11 @@ scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 76	Worker type
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 18.98	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.97	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.97	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.97	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.97	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.97	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.97	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.97	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.97	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21598.77800709101] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.97	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21598.77800709101] 32 GPUs of type v100 left unused. Number of active jobs: 17
 scheduler:DEBUG [21718.775666659254] Current active completion events: dict_keys([])
@@ -22085,11 +22093,11 @@ scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 76	Worker typ
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 133	Worker type: v100	Worker ID(s): 58	Priority: 18.79	Deficit: -634.60	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.78	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.78	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.78	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.78	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.78	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.78	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.78	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.78	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21718.775666659254] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.78	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21718.775666659254] 32 GPUs of type v100 left unused. Number of active jobs: 17
 scheduler:DEBUG [21838.7733262275] Current active completion events: dict_keys([])
@@ -22138,11 +22146,11 @@ scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 169	Worker type
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 76	Worker type: v100	Worker ID(s): 60	Priority: 18.56	Deficit: -1012.83	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.54	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.54	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.54	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.54	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.54	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.54	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.54	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.54	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21838.7733262275] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.54	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21838.7733262275] 33 GPUs of type v100 left unused. Number of active jobs: 16
 scheduler:DEBUG [21958.770985795745] Current active completion events: dict_keys([])
@@ -22187,11 +22195,11 @@ scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 169	Worker ty
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 76	Worker type: v100	Worker ID(s): 60	Priority: 18.35	Deficit: -1012.83	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.34	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.34	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.33	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.33	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.33	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.33	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.33	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.33	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [21958.770985795745] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.33	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [21958.770985795745] 33 GPUs of type v100 left unused. Number of active jobs: 16
 scheduler:DEBUG [22078.76864536399] Current active completion events: dict_keys([])
@@ -22236,11 +22244,11 @@ scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 169	Worker typ
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 76	Worker type: v100	Worker ID(s): 60	Priority: 18.18	Deficit: -1012.83	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.17	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.17	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.16	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.16	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.16	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.16	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.16	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.16	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22078.76864536399] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.16	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [22078.76864536399] 33 GPUs of type v100 left unused. Number of active jobs: 16
 scheduler:DEBUG [22198.766304932236] Current active completion events: dict_keys([])
@@ -22285,11 +22293,11 @@ scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 169	Worker ty
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 76	Worker type: v100	Worker ID(s): 60	Priority: 18.03	Deficit: -1012.83	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 18.02	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 18.02	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.01	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 18.01	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 18.01	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 18.01	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 18.01	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 18.01	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22198.766304932236] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 18.01	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [22198.766304932236] 33 GPUs of type v100 left unused. Number of active jobs: 16
 scheduler:DEBUG [22318.763964500482] Current active completion events: dict_keys([])
@@ -22383,11 +22391,11 @@ scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 169	Worker ty
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 76	Worker type: v100	Worker ID(s): 60	Priority: 17.79	Deficit: -1012.83	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 184	Worker type: v100	Worker ID(s): 63	Priority: 17.77	Deficit: -553.45	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 71	Worker type: v100	Worker ID(s): 59	Priority: 17.77	Deficit: -664.02	Allocation:  [v100 1.00]
-scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 17.77	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 137	Worker type: v100	Worker ID(s): 53	Priority: 17.77	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 115	Worker type: v100	Worker ID(s): 61	Priority: 17.77	Deficit: -400.85	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 78	Worker type: v100	Worker ID(s): 48	Priority: 17.77	Deficit: -428.10	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 43	Worker type: v100	Worker ID(s): 49	Priority: 17.77	Deficit: -428.11	Allocation:  [v100 1.00]
+scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 198	Worker type: v100	Worker ID(s): 51	Priority: 17.77	Deficit: -437.52	Allocation:  [v100 1.00]
 scheduler:INFO [22438.761624068728] [Micro-task scheduled]	Job ID: 196	Worker type: v100	Worker ID(s): 52	Priority: 17.77	Deficit: -437.53	Allocation:  [v100 1.00]
 scheduler:WARNING [22438.761624068728] 33 GPUs of type v100 left unused. Number of active jobs: 16
 scheduler:DEBUG [22558.759283636973] Current active completion events: dict_keys([])
@@ -23728,3 +23736,5 @@ Average job completion time: 8699.250 seconds (2.42 hours)
 Average job completion time (low priority): 8699.250 seconds (2.42 hours)
 Cluster utilization: 0.637
 Extended leases 44.36% of the time (3185/7180)
+worst ftf: 2.574
+unfair fraction: 17.35159817351598

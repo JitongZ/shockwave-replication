@@ -94,9 +94,10 @@ def main(args):
 
     # TODO: Implement other metrics, namely worst finish time fairness (worst FTF) and Unfair Job Fraction
     # Needs to implement those metrics in scheduler.py
-    ftf_list = sched.get_finish_time_fairness()
+    ftf_list, unfair_job_fraction = sched.get_finish_time_fairness()
     # TODO: the following log is temporary
     print(f"worst ftf: {max(ftf_list)}")
+    print(f"unfair fraction: {unfair_job_fraction}")
     sched.shutdown()
 
     # temp trial for plotting
