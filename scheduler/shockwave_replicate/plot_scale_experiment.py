@@ -109,12 +109,14 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names):
 
 if __name__ == "__main__":
     pickle_dir = os.path.join(root_dir, "results/pickle")
-    metrics_to_plot = ["makespan", "avg_jct"]
+    metrics_to_plot = ["makespan", "avg_jct", "worst_ftf", "unfair_fraction"]
     data = load_data(pickle_dir, metrics_to_plot)
     print(data)
     metrics_names = {
         "makespan": "Makespan (s)",
         "avg_jct": "Average Job Completion Time (s)",
+        "worst_ftf": "Worst FTF (ρ)",
+        "unfair_fraction": "Unfair Job Fraction (%)",
     }
     save_dir = os.path.join(root_dir, "results/plots")
     if not os.path.exists(save_dir):

@@ -96,8 +96,8 @@ def main(args):
     # Needs to implement those metrics in scheduler.py
     ftf_list, unfair_job_fraction = sched.get_finish_time_fairness()
     # TODO: the following log is temporary
-    print(f"worst ftf: {max(ftf_list)}")
-    print(f"unfair fraction: {unfair_job_fraction}")
+    # print(f"worst ftf: {max(ftf_list)}")
+    # print(f"unfair fraction: {unfair_job_fraction}")
     sched.shutdown()
 
     # temp trial for plotting
@@ -111,6 +111,32 @@ def main(args):
         "num_gpus": num_gpus[0],
         "makespan": makespan,
         "avg_jct": avg_jct,
+        "worst_ftf": max(ftf_list),
+        "unfair_fraction": unfair_job_fraction,
+    }
+
+    if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
+        os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
+    with open(
+        os.path.join(
+            root_dir,
+            args.pickle_output_dir,
+            f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
+        ),
+        "wb",
+    ) as f:
+        pickle.dump(pickle_object, f)
+    
+    # temporary code for testing the plotting, delete the following
+    args.policy = "shockwave"
+    pickle_object = {
+        "trace_file": args.trace_file,
+        "policy": args.policy,
+        "num_gpus": num_gpus[0],
+        "makespan": makespan,
+        "avg_jct": avg_jct,
+        "worst_ftf": max(ftf_list),
+        "unfair_fraction": unfair_job_fraction,
     }
 
     if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
