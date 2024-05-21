@@ -7,3 +7,5 @@ scheduler/runtime/rpc_stubs
 
 console_output_*.txt
 scheduler/reproduce
+
+scheduler/shockwave_replicate/results/*
