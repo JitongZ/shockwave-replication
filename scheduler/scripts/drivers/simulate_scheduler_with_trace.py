@@ -126,7 +126,7 @@ def main(args):
         "wb",
     ) as f:
         pickle.dump(pickle_object, f)
-    
+
     # temporary code for testing the plotting, delete the following
     args.policy = "shockwave"
     pickle_object = {

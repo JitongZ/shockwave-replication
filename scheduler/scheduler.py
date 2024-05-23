@@ -28,6 +28,8 @@ import set_queue
 from custom_logging import SchedulerAdapter
 from throughput_estimator import ThroughputEstimator
 import utils
+from job_metadata import ShockwaveJobMetadata
+from shockwave import ShockwaveScheduler
 
 # shockwave imports
 import pickle
@@ -339,6 +341,11 @@ class Scheduler:
         # Shockwave: read from pickle file that contains metadata of trace
         with open(pickle_file, "rb") as f:
             self._profiles = pickle.load(f)
+        # Shockwave: initialize shockwave scheduler object
+        if self._policy.name == "Shockwave":
+            self._shockwave = ShockwaveScheduler(shockwave_config)
+        else:
+            self._shockwave = None
 
         port = SCHEDULER_PORT
         callbacks = {
@@ -424,6 +431,20 @@ class Scheduler:
         # Job might have already completed.
         if job_id not in self._throughputs:
             return
+        # Shockwave: update throughput timeline for each job
+        if self._policy.name == "Shockwave":
+            current_round = self._num_completed_rounds
+            for i, id in enumerate(job_id.singletons()):
+                throughput = (
+                    0
+                    if all_execution_times[i] <= 0
+                    else all_num_steps[i] / all_execution_times[i]
+                )
+                bs = self._jobs[job_id].batch_size
+                self._shockwave.job_metadata[id].update_throughput_schedule(
+                    current_round, throughput, bs
+                )
+
         if self._simulate and self._estimate_throughputs:
             if not job_id.is_pair():
                 # Assume single job throughputs are already populated.
@@ -545,7 +566,7 @@ class Scheduler:
             scale_factor = job.scale_factor
             job_type_key = (job_type, scale_factor)
             self._job_id_to_job_type[job_id] = job_type_key
-            # shockwave: increment total number of jobs in trace
+            # Shockwave: increment total number of jobs in trace
             self._num_jobs_in_trace += 1
             if self._estimate_throughputs:
                 self._reference_job_map[job_id] = (
@@ -576,7 +597,12 @@ class Scheduler:
             self._add_to_priorities(job_id)
             self._need_to_update_allocation = True
             self._bs_scale[job_id] = None
-
+            # Shockwave: initialize shockwave job metadata
+            if self._policy.name == "Shockwave":
+                metadata = ShockwaveJobMetadata(
+                    self._profiles, self._time_per_iteration
+                )
+                self._shockwave.add_metadata(job_id, metadata)
             if timestamp is None:
                 timestamp = self.get_current_timestamp()
             self._per_job_start_timestamps[job_id] = timestamp
@@ -866,6 +892,7 @@ class Scheduler:
           A list of job IDs and associated scale factors to schedule for the
           upcoming round.
         """
+        # Shockwave TODO: use shockwave's scheduler to solve for schedule
 
         already_scheduled_jobs = set()
         scheduled_jobs = {}
@@ -1439,7 +1466,7 @@ class Scheduler:
                     self._all_jobs.append((0, job))
                     job_id = self.add_job(job, timestamp=0)
 
-        while True:
+        while True:  # Each iteration represents one round
             if debug:
                 input("Press Enter to continue...")
             if jobs_to_complete is not None:
@@ -1697,6 +1724,9 @@ class Scheduler:
                     running_jobs,
                 )
                 checkpoint_complete = True
+
+            # End of current round
+            self._num_completed_rounds += 1
 
         if window_start_time is not None:
             print("Window start time: %f" % (window_start_time))
@@ -3541,7 +3571,7 @@ class Scheduler:
                 )
                 rho = round(jct / (jct_if_isolated * avg_contention_factor), 3)
                 ftf_list.append(rho)
-            
+
             num_unfair_jobs = sum(ftf > 1.0 for ftf in ftf_list)
             unfair_job_fraction = 100 * num_unfair_jobs / len(ftf_list)
         return ftf_list, unfair_job_fraction

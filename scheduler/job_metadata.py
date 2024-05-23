@@ -1,17 +1,18 @@
 import copy
 import numpy as np
+from collections import OrderedDict
 
 INFINITY = 1e9
 
 
 class ShockwaveJobMetadata:
-    def __init__(self, config):
+    def __init__(self, config: dict, round_duration: int):
         """
         ShockwaveJobMetadata constructor.
 
         Parameters:
-        - config: dict
-            A dictionary mapping configuration fields to their values. Expected keys are:
+        - config: dict, a dictionary mapping configuration fields to their values.
+            Expected keys are:
             - "num_epochs": int, total number of epochs.
             - "num_samples_per_epoch": int, number of samples processed per epoch.
             - "scale_factor": int, number of workers or scale factor.
@@ -24,8 +25,9 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
-        # Pre-configured
         self.total_epochs = config["num_epochs"]
+        self.completed_epochs = 0
+
         self.nsamples_per_epoch = config["num_samples_per_epoch"]
         self.nworkers = config["scale_factor"]
         self.duration = config["duration"]
@@ -33,28 +35,26 @@ class ShockwaveJobMetadata:
         self.epoch_batch_sizes = config["bs_every_epoch"]
         self.epoch_mem_reqs = config["mem_every_epoch"]
         self.epoch_gpu_reqs = config["util_every_epoch"]
-        self.epoch_durations = [
-            max(1.0, round(duration)) for duration in config["duration_every_epoch"]
-        ]
+        durations = config["duration_every_epoch"]
 
-        # Newly added
+        self.epoch_durations = [max(1.0, round(duration)) for duration in durations]
         self.estimated_epoch_durations = copy.deepcopy(self.epoch_durations)
+
         self.regimes = sorted(list(set(self.epoch_batch_sizes)))
         self.dirichlet = {
             bs: self.total_epochs / len(self.regimes) for bs in self.regimes
         }
-        self.completed_epochs = 0
-        self.throughput_schedule = None
-        self.round_duration = None
+
         self.submit_time = None
+        self.throughput_schedule = OrderedDict()
+        self.round_duration = round_duration
 
     def submit(self, time):
         """
         Set job submit time, used for finish time fairness computation.
 
         Parameters:
-        - time: float
-            Time when the job is added.
+        - time: float, time when the job is added.
 
         Returns:
         - None
@@ -72,23 +72,19 @@ class ShockwaveJobMetadata:
         """
         self.completed_epochs = self.total_epochs
 
-    def set_throughput_schedule(self, throughput_schedule, round_duration):
+    def update_throughput_schedule(self, round_id, throughput, bs):
         """
-        Set the throughput schedule of the current job.
+        Update the throughput schedule of the current job.
 
         Parameters:
-        - throughput_schedule: dict
-            A dictionary where keys are round numbers and values are tuples
-            (measured_throughput, measured_bs), representing the throughput and batch size
-            measured for that round.
-        - round_duration: float
-            Duration of each round in seconds.
+        - round_id: int, index of current round.
+        - throughput: float, throughput in the current round.
+        - bs: int, batch size in the current round.
 
         Returns:
         - None
         """
-        self.throughput_schedule = throughput_schedule
-        self.round_duration = round_duration
+        self.throughput_schedule[round_id] = (throughput, bs)
 
     def compute_estimated_epoch_duration(self):
         """
