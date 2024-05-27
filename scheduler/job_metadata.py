@@ -86,7 +86,7 @@ class ShockwaveJobMetadata:
         """
         self.throughput_schedule[round_id] = (throughput, bs)
 
-    def compute_estimated_epoch_duration(self):
+    def recompute_epoch_duration(self):
         """
         Compute the estimated epoch duration based on the throughput schedule.
         This adjusts the estimated durations of epochs to better match the actual measured throughput.
@@ -153,7 +153,7 @@ class ShockwaveJobMetadata:
         - dict: A dictionary where keys are batch sizes (bs) and values are the
           average duration of epochs with that batch size.
         """
-        self.compute_estimated_epoch_duration()
+        self.recompute_epoch_duration()
         bs_epoch_duration_map = {}
         for iepoch, duration in enumerate(self.epoch_durations):
             bs = self.epoch_batch_sizes[iepoch]
@@ -195,18 +195,19 @@ class ShockwaveJobMetadata:
             if dirichlet_rebased[bs] >= 1:
                 dirichlet_rebased[bs] -= 1
 
+        # Scale down dirichlet_rebased so that total remaining epochs stay the same
         remaining_epochs = self.total_epochs - self.completed_epochs
-        inflated_remaining_epochs = max(
-            remaining_epochs, int(sum(list(dirichlet_rebased.values())) + 1)
+        normalizer = min(
+            1, remaining_epochs / int(sum(list(dirichlet_rebased.values())) + 1)
         )
 
         # Compute the remaining runtime based on average epoch durations
         bs_epoch_duration_map = self.compute_bs_epoch_duration()
         remaining_runtime = 0.0
         for bs in dirichlet_rebased.keys():
-            remaining_epochs_bs = dirichlet_rebased[bs]
-            remaining_runtime += remaining_epochs_bs * bs_epoch_duration_map[bs]
+            bs_remaining_epochs = dirichlet_rebased[bs]
+            remaining_runtime += bs_remaining_epochs * bs_epoch_duration_map[bs]
 
-        remaining_runtime *= remaining_epochs / inflated_remaining_epochs
+        remaining_runtime *= normalizer
 
         return remaining_runtime
