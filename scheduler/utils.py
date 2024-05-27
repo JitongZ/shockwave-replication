@@ -21,6 +21,7 @@ from policies import (
     max_min_fairness_water_filling,
     max_sum_throughput,
     min_total_duration,
+    shockwave,
 )
 
 
@@ -250,6 +251,7 @@ def get_available_policies():
         "min_total_duration",
         "min_total_duration_perf",
         "min_total_duration_packed",
+        "shockwave",
     ]
 
 
@@ -542,6 +544,8 @@ def get_policy(policy_name, solver=None, seed=None, priority_reweighting_policie
         policy = min_total_duration.MinTotalDurationPolicyWithPerf(solver=solver)
     elif policy_name == "min_total_duration_packed":
         policy = min_total_duration.MinTotalDurationPolicyWithPacking(solver=solver)
+    elif policy_name == "shockwave":
+        policy = shockwave.ShockwavePolicy()
     else:
         raise ValueError("Unknown policy!")
     return policy
