@@ -25,6 +25,7 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
+        config = config[0]
         self.total_epochs = config["num_epochs"]
         self.completed_epochs = 0
 
@@ -62,7 +63,7 @@ class ShockwaveJobMetadata:
         if self.submit_time is None:
             self.submit_time = time
 
-    def complete(self):
+    def complete(self, num_epochs=None):
         """
         Mark the current job as complete by setting the number of completed epochs
         to the total number of epochs.
@@ -70,7 +71,10 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
-        self.completed_epochs = self.total_epochs
+        if num_epochs is None:
+            self.completed_epochs = self.total_epochs
+        else:
+            self.completed_epochs = num_epochs
 
     def update_throughput_schedule(self, round_id, throughput, bs):
         """

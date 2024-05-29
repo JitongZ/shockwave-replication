@@ -346,6 +346,8 @@ class Scheduler:
             self._shockwave = ShockwaveScheduler(shockwave_config)
         else:
             self._shockwave = None
+        # Shockwave: scheduled jobs in the same round
+        self._current_round_scheduled_jobs = None
 
         port = SCHEDULER_PORT
         callbacks = {
@@ -602,6 +604,7 @@ class Scheduler:
                 metadata = ShockwaveJobMetadata(
                     self._profiles, self._time_per_iteration
                 )
+                metadata.submit(self.get_current_timestamp())
                 self._shockwave.add_metadata(job_id, metadata)
             if timestamp is None:
                 timestamp = self.get_current_timestamp()
@@ -787,9 +790,12 @@ class Scheduler:
                     )
                 )
                 continue
-            allocation_str = ""
-            for x in worker_types:
-                allocation_str += " [%4s %.2f]" % (x, allocation[job_id][x])
+            if self._policy.name == "Shockwave":
+                allocation_str = "[n/a]"
+            else:
+                allocation_str = ""
+                for x in worker_types:
+                    allocation_str += " [%4s %.2f]" % (x, allocation[job_id][x])
             self._logger.info(
                 "[Micro-task scheduled]\tJob ID: {job_id}\t"
                 "Worker type: {worker_type}\tWorker ID(s): {worker_ids}\t"
@@ -892,8 +898,6 @@ class Scheduler:
           A list of job IDs and associated scale factors to schedule for the
           upcoming round.
         """
-        # Shockwave TODO: use shockwave's scheduler to solve for schedule
-
         already_scheduled_jobs = set()
         scheduled_jobs = {}
 
@@ -982,6 +986,20 @@ class Scheduler:
 
         return scheduled_jobs
 
+    def _shockwave_schedule_helper(self):
+        worker_type = "v100"
+        scheduled_jobs = {}
+        scheduled_jobs[worker_type] = []
+        self._current_round_scheduled_jobs = self._shockwave.current_round_schedule()
+        assert self._current_round_scheduled_jobs is not None, "_current_round_scheduled_jobs is None."
+        for job_id in self._current_round_scheduled_jobs:
+            assert job_id in self._jobs, "Job not found."
+            scale_factor = self._jobs[job_id].scale_factor
+            job_id = job_id_pair.JobIdPair(job_id, None)
+            scheduled_jobs[worker_type].append((job_id, scale_factor))
+        return scheduled_jobs
+        
+
     # @preconditions(lambda self: self._simulate or self._scheduler_lock.locked())
     def _schedule_jobs_on_workers(self):
         """Attempts to schedule jobs on as many alive workers as possible.
@@ -990,10 +1008,10 @@ class Scheduler:
           A list of job IDs and tuple of worker IDs for each scheduled job
           in the coming round.
         """
-
-        # Update priorities before trying to figure out applications to run
-        # in the upcoming round.
-        self._update_priorities()
+        if self._policy.name != "Shockwave":
+            # Update priorities before trying to figure out applications to run
+            # in the upcoming round.
+            self._update_priorities()
 
         to_remove = []
         worker_types = ["v100", "p100", "k80"]
@@ -1008,7 +1026,10 @@ class Scheduler:
             self._worker_type_shuffler.shuffle(worker_types)
 
         new_worker_assignments = collections.OrderedDict()
-        scheduled_jobs = self._schedule_jobs_on_workers_helper(worker_types)
+        if self._policy.name == "Shockwave":
+            scheduled_jobs = self._shockwave_schedule_helper()
+        else:
+            scheduled_jobs = self._schedule_jobs_on_workers_helper(worker_types)
 
         worker_state = {}
         for worker_type in worker_types:
@@ -1063,7 +1084,8 @@ class Scheduler:
                 for job_id, scale_factor in scheduled_jobs[worker_type]:
                     if scale_factor != current_scale_factor:
                         continue
-                    elif job_id not in self._allocation:
+                    # self._allocation is {} for Shockwave
+                    elif self._policy.name != "Shockwave" and job_id not in self._allocation:
                         continue
                     self._assign_workers_to_job(
                         job_id,
@@ -1072,6 +1094,7 @@ class Scheduler:
                         per_worker_state,
                         new_worker_assignments,
                     )
+
 
         # Verify the assignment.
         num_assignments = {}
@@ -1555,6 +1578,9 @@ class Scheduler:
                     self._simulate_accordion(single_job_id)
                 elif self._jobs[single_job_id].mode == "gns":
                     self._simulate_gns(single_job_id)
+
+            if self._policy.name == "Shockwave" and self._num_completed_rounds >= 1:
+                self._shockwave_scheduler_update()
 
             # Since we're scheduling in rounds, no jobs should be
             # running when scheduling the next round of jobs.
@@ -3542,6 +3568,32 @@ class Scheduler:
 
             # reset the flags
             self._bs_scale[job_id] = None
+
+    """
+    Shockwave: Update scheduler fields
+    """
+    def _shockwave_scheduler_update(self):
+        for job_id in (self._current_round_scheduled_jobs):
+            if job_id in self._completed_jobs:
+                # job has completely finished
+                if job_id in self._shockwave.job_metadata:
+                    self._shockwave.job_metadata[job_id].complete()
+                continue
+            if job_id not in self._steps_run_so_far.keys():
+                # job hasn't been run
+                steps_run_so_far = 0
+            else:
+                steps_run_so_far = self._steps_run_so_far[job_id]["v100"]
+
+            bs = self._jobs[job_id].batch_size
+            dataset_size = dataset_size_dict[self._jobs[job_id].model]
+            current_epoch = math.floor(
+                steps_run_so_far / math.ceil(dataset_size / bs)
+            )
+            assert job_id in self._shockwave.job_metadata.keys()
+            self._shockwave.job_metadata[job_id].complete(current_epoch)
+
+        self._shockwave.increment_round()
 
     """
     Shockwave: Get finish time fairness (FTF) for every job

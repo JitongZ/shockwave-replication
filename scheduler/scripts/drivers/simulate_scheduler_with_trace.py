@@ -61,7 +61,11 @@ def main(args):
         assert (
             args.config
         ), "A .json configuration file is needed when running the shockwave policy"
-        shockwave_config = json.load(open(args.config, "r"))
+        config_path = os.path.join(
+            root_dir,
+            args.config
+        )
+        shockwave_config = json.load(open(config_path, "r"))
         shockwave_config["time_per_iteration"] = args.time_per_iteration
         shockwave_config["num_gpus"] = (
             cluster_spec["v100"] * num_gpus_per_server["v100"]
@@ -233,5 +237,11 @@ if __name__ == "__main__":
         type=str,
         default="../../shockwave_replicate/results/pickle",
         help="Path of the directory that stores the statistics of simluation in *.pickle format",
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="../../shockwave_replicate/scale_64gpus.json",
+        help="Config file for Shockwave"
     )
     main(parser.parse_args())
