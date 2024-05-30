@@ -443,9 +443,10 @@ class Scheduler:
                     else all_num_steps[i] / all_execution_times[i]
                 )
                 bs = self._jobs[job_id].batch_size
-                self._shockwave.job_metadata[id].update_throughput_schedule(
-                    current_round, throughput, bs
-                )
+                if id in self._shockwave.job_metadata:
+                    self._shockwave.job_metadata[id].update_throughput_schedule(
+                        current_round, throughput, bs
+                    )
 
         if self._simulate and self._estimate_throughputs:
             if not job_id.is_pair():
@@ -602,7 +603,7 @@ class Scheduler:
             # Shockwave: initialize shockwave job metadata
             if self._policy.name == "Shockwave":
                 metadata = ShockwaveJobMetadata(
-                    self._profiles, self._time_per_iteration
+                    self._profiles, self._time_per_iteration, job.scale_factor
                 )
                 metadata.submit(self.get_current_timestamp())
                 self._shockwave.add_metadata(job_id, metadata)
@@ -993,10 +994,15 @@ class Scheduler:
         self._current_round_scheduled_jobs = self._shockwave.current_round_schedule()
         assert self._current_round_scheduled_jobs is not None, "_current_round_scheduled_jobs is None."
         for job_id in self._current_round_scheduled_jobs:
-            assert job_id in self._jobs, "Job not found."
-            scale_factor = self._jobs[job_id].scale_factor
-            job_id = job_id_pair.JobIdPair(job_id, None)
-            scheduled_jobs[worker_type].append((job_id, scale_factor))
+            if job_id in self._jobs:
+                scale_factor = self._jobs[job_id].scale_factor
+                job_id = job_id_pair.JobIdPair(job_id, None)
+                scheduled_jobs[worker_type].append((job_id, scale_factor))
+        
+        self._logger.info(
+            f"scheduled_jobs: {scheduled_jobs}"
+        )
+        
         return scheduled_jobs
         
 
@@ -1705,8 +1711,12 @@ class Scheduler:
                     )
                     self._running_jobs.add(job_id)
             else:
+                if len(self._jobs) == 0:
+                    break
                 with self._scheduler_lock:
                     scheduled_jobs = self._schedule_jobs_on_workers()
+                    if self._policy.name == "Shockwave" and len(scheduled_jobs) == 0:
+                        break
                     for job_id in self._current_worker_assignments:
                         is_active = any([x in self._jobs for x in job_id.singletons()])
                         if is_active:
@@ -3578,6 +3588,7 @@ class Scheduler:
                 # job has completely finished
                 if job_id in self._shockwave.job_metadata:
                     self._shockwave.job_metadata[job_id].complete()
+                    # self._shockwave.delete_metadata(job_id)
                 continue
             if job_id not in self._steps_run_so_far.keys():
                 # job hasn't been run
@@ -3585,13 +3596,19 @@ class Scheduler:
             else:
                 steps_run_so_far = self._steps_run_so_far[job_id]["v100"]
 
-            bs = self._jobs[job_id].batch_size
-            dataset_size = dataset_size_dict[self._jobs[job_id].model]
-            current_epoch = math.floor(
-                steps_run_so_far / math.ceil(dataset_size / bs)
-            )
-            assert job_id in self._shockwave.job_metadata.keys()
-            self._shockwave.job_metadata[job_id].complete(current_epoch)
+            if job_id in self._shockwave.job_metadata:
+                bs = self._jobs[job_id].batch_size
+                dataset_size = dataset_size_dict[self._jobs[job_id].model]
+                current_epoch = min(
+                    self._shockwave.job_metadata[job_id].total_epochs,
+                    math.floor(
+                        steps_run_so_far / math.ceil(dataset_size / bs)
+                    )            
+                )
+                assert job_id in self._shockwave.job_metadata.keys()
+                self._shockwave.job_metadata[job_id].complete(current_epoch)
+                # if current_epoch == self._shockwave.job_metadata[job_id].total_epochs:
+                #     self._shockwave.delete_metadata(job_id)
 
         self._shockwave.increment_round()
 

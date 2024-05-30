@@ -6,7 +6,7 @@ INFINITY = 1e9
 
 
 class ShockwaveJobMetadata:
-    def __init__(self, config: dict, round_duration: int):
+    def __init__(self, config: dict, round_duration: int, scale_factor=None):
         """
         ShockwaveJobMetadata constructor.
 
@@ -31,6 +31,9 @@ class ShockwaveJobMetadata:
 
         self.nsamples_per_epoch = config["num_samples_per_epoch"]
         self.nworkers = config["scale_factor"]
+        if scale_factor is not None:
+            self.nworkers = scale_factor
+        # print(f"self.nworkers:{self.nworkers}")
         self.duration = config["duration"]
 
         self.epoch_batch_sizes = config["bs_every_epoch"]
@@ -74,6 +77,7 @@ class ShockwaveJobMetadata:
         if num_epochs is None:
             self.completed_epochs = self.total_epochs
         else:
+            assert num_epochs <= self.total_epochs, f"Incorrect epoch progress {num_epochs}"
             self.completed_epochs = num_epochs
 
     def update_throughput_schedule(self, round_id, throughput, bs):
