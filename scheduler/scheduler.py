@@ -833,6 +833,11 @@ class Scheduler:
                         num_active_jobs=len(self._jobs),
                     )
                 )
+                self._logger.warn(
+                    "List of active jobs: {active_jobs}".format(
+                        active_jobs=self._jobs.keys(),
+                    )
+                )
 
     def _assign_workers_to_job(
         self, job_id, scale_factor, worker_type, worker_state, worker_assignments
@@ -856,6 +861,7 @@ class Scheduler:
         assigned_worker_ids = worker_state["assigned_worker_ids"]
         server_id_ptr = worker_state["server_id_ptr"]
 
+        print(f"#### job:{job_id} scale:{scale_factor}")
         if job_id in worker_assignments:
             worker_ids_for_job = list(worker_assignments[job_id])
         else:
@@ -991,20 +997,20 @@ class Scheduler:
         worker_type = "v100"
         scheduled_jobs = {}
         scheduled_jobs[worker_type] = []
+        # self._shockwave.set_recompute_flag()
         self._current_round_scheduled_jobs = self._shockwave.current_round_schedule()
-        assert self._current_round_scheduled_jobs is not None, "_current_round_scheduled_jobs is None."
+        assert (
+            self._current_round_scheduled_jobs is not None
+        ), "_current_round_scheduled_jobs is None."
         for job_id in self._current_round_scheduled_jobs:
             if job_id in self._jobs:
                 scale_factor = self._jobs[job_id].scale_factor
                 job_id = job_id_pair.JobIdPair(job_id, None)
                 scheduled_jobs[worker_type].append((job_id, scale_factor))
-        
-        self._logger.info(
-            f"scheduled_jobs: {scheduled_jobs}"
-        )
-        
+
+        self._logger.info(f"scheduled_jobs: {scheduled_jobs}")
+
         return scheduled_jobs
-        
 
     # @preconditions(lambda self: self._simulate or self._scheduler_lock.locked())
     def _schedule_jobs_on_workers(self):
@@ -1091,7 +1097,10 @@ class Scheduler:
                     if scale_factor != current_scale_factor:
                         continue
                     # self._allocation is {} for Shockwave
-                    elif self._policy.name != "Shockwave" and job_id not in self._allocation:
+                    elif (
+                        self._policy.name != "Shockwave"
+                        and job_id not in self._allocation
+                    ):
                         continue
                     self._assign_workers_to_job(
                         job_id,
@@ -1100,7 +1109,6 @@ class Scheduler:
                         per_worker_state,
                         new_worker_assignments,
                     )
-
 
         # Verify the assignment.
         num_assignments = {}
@@ -3454,6 +3462,9 @@ class Scheduler:
 
             for single_job_id in to_remove:
                 self._remove_job(single_job_id)
+                if self._policy.name == "Shockwave":
+                    print(f"Delete metadata {single_job_id}")
+                    self._shockwave.delete_metadata(single_job_id)
 
             # Schedule the job for re-dispatching if necessary.
             is_active = any([x in self._jobs for x in job_id.singletons()])
@@ -3582,8 +3593,9 @@ class Scheduler:
     """
     Shockwave: Update scheduler fields
     """
+
     def _shockwave_scheduler_update(self):
-        for job_id in (self._current_round_scheduled_jobs):
+        for job_id in self._current_round_scheduled_jobs:
             if job_id in self._completed_jobs:
                 # job has completely finished
                 if job_id in self._shockwave.job_metadata:
@@ -3601,9 +3613,7 @@ class Scheduler:
                 dataset_size = dataset_size_dict[self._jobs[job_id].model]
                 current_epoch = min(
                     self._shockwave.job_metadata[job_id].total_epochs,
-                    math.floor(
-                        steps_run_so_far / math.ceil(dataset_size / bs)
-                    )            
+                    math.floor(steps_run_so_far / math.ceil(dataset_size / bs)),
                 )
                 assert job_id in self._shockwave.job_metadata.keys()
                 self._shockwave.job_metadata[job_id].complete(current_epoch)

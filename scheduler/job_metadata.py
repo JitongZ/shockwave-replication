@@ -77,7 +77,9 @@ class ShockwaveJobMetadata:
         if num_epochs is None:
             self.completed_epochs = self.total_epochs
         else:
-            assert num_epochs <= self.total_epochs, f"Incorrect epoch progress {num_epochs}"
+            assert (
+                num_epochs <= self.total_epochs
+            ), f"Incorrect epoch progress {num_epochs}"
             self.completed_epochs = num_epochs
 
     def update_throughput_schedule(self, round_id, throughput, bs):

@@ -56,46 +56,54 @@ class ShockwaveScheduler(object):
                 [cp.Variable(boolean=True) for _ in range(self.future_rounds)]
             )
         # make sure number of required workers each round smaller than number of GPUs
-        round_schedule_constrs = self.create_round_schedule_constraints(round_schedule_vars)
+        round_schedule_constrs = self.create_round_schedule_constraints(
+            round_schedule_vars
+        )
         return round_schedule_vars, round_schedule_constrs
 
     def create_round_schedule_constraints(self, round_schedule_vars):
         round_schedule_constrs = []
-        jobs_nworkers = [job.nworkers for job in self.job_metadata.values()]
+        jobs_nworkers = [job.nworkers for job in list(self.job_metadata.values())]
         for iround in range(self.future_rounds):
             round_schedule = [
                 round_schedule_vars[ijob][iround] for ijob in range(self.num_jobs)
             ]
-            round_required_workers = (
-                cp.hstack(round_schedule) @ cp.hstack(jobs_nworkers)
+            round_required_workers = cp.hstack(round_schedule) @ cp.hstack(
+                jobs_nworkers
             )
             round_schedule_constrs.append(round_required_workers <= self.num_gpus)
         return round_schedule_constrs
 
     def current_round_schedule(self):
         print(f"Computing schedule for round {self.round_index}, njobs={self.num_jobs}")
-        
+
         if not self.recompute_flag:
             if len(self.schedules) > 0 and self.round_index in self.schedules.keys():
                 print(f"Using previous round schedule...")
                 return self.schedules[self.round_index]
-        
+
         # TODO: only update schedule when recompute flag is true
         schedule_vars = self._eisenberg_gale_program()
-        jobs_nworkers = [job.nworkers for job in self.job_metadata.values()]
-        print(f"job_nworkers:{jobs_nworkers}")
-        round_schedule = [
-            schedule_vars[ijob][0].value for ijob in range(self.num_jobs)
-        ]
-        round_required_workers = (
-            cp.hstack(round_schedule) @ cp.hstack(jobs_nworkers)
+        jobs_nworkers = [job.nworkers for job in list(self.job_metadata.values())]
+        # print(f"job_nworkers:{jobs_nworkers}")
+        round_schedule = [schedule_vars[ijob][0].value for ijob in range(self.num_jobs)]
+        round_required_workers = cp.hstack(round_schedule) @ cp.hstack(jobs_nworkers)
+        print(
+            f"round_required_workers: {round_required_workers.value} = {cp.hstack(round_schedule).value} @ {cp.hstack(jobs_nworkers).value}, self.num_gpus: {self.num_gpus}"
         )
-        print(f"round_required_workers: {round_required_workers.value}, self.num_gpus: {self.num_gpus}")
 
         self._generate_schedule(schedule_vars)
 
-        print(f"Result for round {self.round_index}: {self.schedules[self.round_index]}")
+        print(
+            f"Result for round {self.round_index}: {self.schedules[self.round_index]}"
+        )
+        for id in self.schedules[self.round_index]:
+            key = list(self.job_metadata.keys())[id]
+            print(
+                f"id: {id}, job: {key}, nworkers: {list(self.job_metadata.values())[id].nworkers}"
+            )
 
+        self.unset_recompute_flag()
         # write to self.schedules
         return self.schedules[self.round_index]
 
@@ -119,7 +127,7 @@ class ShockwaveScheduler(object):
         planned_epochs_constrs = []
 
         for ijob in range(self.num_jobs):
-            job = self.job_metadata[ijob]
+            job = list(self.job_metadata.values())[ijob]
             # epoch progress of a job in future_rounds, the right term in EQ(7)
             planned_epochs = cp.Variable(nonneg=True)
 
@@ -164,7 +172,7 @@ class ShockwaveScheduler(object):
             #     * ((objective_epochs_normalized - breakpoints[:-1])
             #     @ segment_pointer)
             # )
-            
+
             # log_utilities.append(log_var_approx)
             # job_utility_constrs += approx_constraints
             # ###
@@ -174,18 +182,12 @@ class ShockwaveScheduler(object):
                 cp.Variable(nonneg=True) for _ in range(len(bases_breakpoints))
             ]
             var_log_progress_normalized = cp.sum(
-                cp.multiply(
-                    cp.hstack((vars_cursor)), np.array(log_bases)
-                )
+                cp.multiply(cp.hstack((vars_cursor)), np.array(log_bases))
             )
 
             cursor_consts = []
             cursor_consts += [
-                cp.sum(
-                    cp.multiply(
-                        cp.hstack(vars_cursor), np.array(bases_breakpoints)
-                    )
-                )
+                cp.sum(cp.multiply(cp.hstack(vars_cursor), np.array(bases_breakpoints)))
                 == objective_epochs_normalized
             ]
             cursor_consts += [cp.sum(cp.hstack(vars_cursor)) == 1.0]
@@ -203,15 +205,13 @@ class ShockwaveScheduler(object):
                 for lboundary in range(0, len(vars_boundary) - 2):
                     for rboundary in range(lboundary + 2, len(vars_boundary)):
                         boundary_consts += [
-                            vars_boundary[lboundary] + vars_boundary[rboundary]
-                            <= 1.0
+                            vars_boundary[lboundary] + vars_boundary[rboundary] <= 1.0
                         ]
-            
+
             log_utilities.append(var_log_progress_normalized)
             job_utility_constrs += cursor_consts
             job_utility_constrs += boundary_consts
             ###
-
 
         job_utility_constrs += planned_epochs_constrs
 
@@ -247,7 +247,7 @@ class ShockwaveScheduler(object):
         remaining_times = []
         finish_time_fairnesses = []
         for ijob in range(self.num_jobs):
-            job = self.job_metadata[ijob]
+            job = list(self.job_metadata.values())[ijob]
             contention_factor = self.num_jobs / self.num_gpus
             planned_time = planned_runtimes[ijob]
             round_time = (self.round_index + self.future_rounds) * self.round_duration
@@ -303,12 +303,9 @@ class ShockwaveScheduler(object):
             priority = priorities[ijob]
             if job_planned_rounds[ijob] > 0:
                 avg_sched_idx = (
-                    (
-                        cp.hstack([t for t in range(self.future_rounds)]) @
-                        cp.hstack(prioritized_schedule_vars[ijob])
-                    )
-                    / job_planned_rounds[ijob]
-                )
+                    cp.hstack([t for t in range(self.future_rounds)])
+                    @ cp.hstack(prioritized_schedule_vars[ijob])
+                ) / job_planned_rounds[ijob]
                 objective_per_job.append(avg_sched_idx * priority)
 
         if len(objective_per_job) == 0:
@@ -361,7 +358,9 @@ class ShockwaveScheduler(object):
         problem = self._solve_gurobi(objective, constraints)
         assert problem.status in cp.settings.SOLUTION_PRESENT
 
-        round_schedule_vars = self._prioritize_unfair_jobs(round_schedule_vars, priorities)
+        round_schedule_vars = self._prioritize_unfair_jobs(
+            round_schedule_vars, priorities
+        )
 
         return round_schedule_vars
 
