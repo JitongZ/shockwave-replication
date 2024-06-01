@@ -25,7 +25,6 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
-        config = config[0]
         self.total_epochs = config["num_epochs"]
         self.completed_epochs = 0
 

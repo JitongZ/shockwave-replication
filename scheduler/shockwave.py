@@ -88,20 +88,8 @@ class ShockwaveScheduler(object):
         # print(f"job_nworkers:{jobs_nworkers}")
         round_schedule = [schedule_vars[ijob][0].value for ijob in range(self.num_jobs)]
         round_required_workers = cp.hstack(round_schedule) @ cp.hstack(jobs_nworkers)
-        print(
-            f"round_required_workers: {round_required_workers.value} = {cp.hstack(round_schedule).value} @ {cp.hstack(jobs_nworkers).value}, self.num_gpus: {self.num_gpus}"
-        )
 
         self._generate_schedule(schedule_vars)
-
-        print(
-            f"Result for round {self.round_index}: {self.schedules[self.round_index]}"
-        )
-        for id in self.schedules[self.round_index]:
-            key = list(self.job_metadata.keys())[id]
-            print(
-                f"id: {id}, job: {key}, nworkers: {list(self.job_metadata.values())[id].nworkers}"
-            )
 
         self.unset_recompute_flag()
         # write to self.schedules
@@ -371,7 +359,7 @@ class ShockwaveScheduler(object):
             future_round_index = self.round_index + iround
             for ijob in range(self.num_jobs):
                 if bool(round_schedule_vars[ijob][iround].value.item()):
-                    scheduled_job_ids.append(ijob)
+                    scheduled_job_ids.append(list(self.job_metadata.keys())[ijob])
             # rounds_schedules[future_round_index] = scheduled_job_ids
             self.schedules[future_round_index] = scheduled_job_ids
         # return rounds_schedules

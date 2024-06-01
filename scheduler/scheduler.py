@@ -603,7 +603,7 @@ class Scheduler:
             # Shockwave: initialize shockwave job metadata
             if self._policy.name == "Shockwave":
                 metadata = ShockwaveJobMetadata(
-                    self._profiles, self._time_per_iteration, job.scale_factor
+                    self._profiles[job_id.integer_job_id()], self._time_per_iteration, job.scale_factor
                 )
                 metadata.submit(self.get_current_timestamp())
                 self._shockwave.add_metadata(job_id, metadata)
@@ -857,11 +857,11 @@ class Scheduler:
             server_id_ptr: The server to assign workers from.
           worker_assignments: A map from job_id to assigned worker_ids tuple.
         """
+        print(locals())
         worker_ids = worker_state["worker_ids"]
         assigned_worker_ids = worker_state["assigned_worker_ids"]
         server_id_ptr = worker_state["server_id_ptr"]
 
-        print(f"#### job:{job_id} scale:{scale_factor}")
         if job_id in worker_assignments:
             worker_ids_for_job = list(worker_assignments[job_id])
         else:
@@ -1005,7 +1005,6 @@ class Scheduler:
         for job_id in self._current_round_scheduled_jobs:
             if job_id in self._jobs:
                 scale_factor = self._jobs[job_id].scale_factor
-                job_id = job_id_pair.JobIdPair(job_id, None)
                 scheduled_jobs[worker_type].append((job_id, scale_factor))
 
         self._logger.info(f"scheduled_jobs: {scheduled_jobs}")
