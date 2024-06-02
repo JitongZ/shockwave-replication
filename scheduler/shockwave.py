@@ -197,7 +197,7 @@ class ShockwaveScheduler(object):
 
         job_utility_constrs += planned_epochs_constrs
 
-        return planned_runtimes, log_utilities, job_utility_constrs
+        return log_utilities, job_utility_constrs
 
     def _compute_interpolated_finish_time(self, alpha=0.9):
         """
@@ -281,11 +281,11 @@ class ShockwaveScheduler(object):
         for ijob in range(self.num_jobs):
             priority = priorities[ijob]
             if job_planned_rounds[ijob] > 0:
-                avg_sched_idx = (
+                average_ranking = (
                     cp.hstack([t for t in range(self.future_rounds)])
                     @ cp.hstack(prioritized_schedule_vars[ijob])
                 ) / job_planned_rounds[ijob]
-                objective_per_job.append(avg_sched_idx * priority)
+                objective_per_job.append(average_ranking * priority)
 
         if len(objective_per_job) == 0:
             return schedule_vars
@@ -299,7 +299,24 @@ class ShockwaveScheduler(object):
         return prioritized_schedule_vars
 
     def _eisenberg_gale_program(self):
-        """ """
+        """
+        Generates and solves the Eisenberg-Gale (EG) program for job scheduling.
+
+        This function constructs the constraints and objective for the EG program, a mathematical
+        model used for fair job scheduling. It performs the following steps:
+
+        1. Creates round's job schedule variables and corresponding constraints.
+        2. Computes utility-related variables and constraints.
+        3. Computes remaining run times and finish time fairnesses (FTFs).
+        4. Computes makespan.
+        5. Computes prioritized log utilities based on job priorities.
+        6. Defines the objective function to maximize prioritized utilities and minimize makespan.
+        7. Solves the optimization problem using Gurobi.
+        8. Prioritizes unfair jobs based on computed priorities.
+
+        Returns:
+        - list, the prioritized round schedule variables.
+        """
         constraints = []
         # create a round's job schedule's cp variables, and corresponding constraints
         round_schedule_vars, round_schedule_constrs = (
@@ -307,7 +324,7 @@ class ShockwaveScheduler(object):
         )
         constraints += round_schedule_constrs
         # compute utility related variables and constraints
-        planned_runtimes, log_utilities, job_utility_constrs = self._job_log_utility(
+        log_utilities, job_utility_constrs = self._job_log_utility(
             round_schedule_vars
         )
         constraints += job_utility_constrs
@@ -342,16 +359,14 @@ class ShockwaveScheduler(object):
         return round_schedule_vars
 
     def _generate_schedule(self, round_schedule_vars):
-        # rounds_schedules = OrderedDict()
         for iround in range(self.future_rounds):
             scheduled_job_ids = []
             future_round_index = self.round_index + iround
             for ijob in range(self.num_jobs):
                 if bool(round_schedule_vars[ijob][iround].value.item()):
                     scheduled_job_ids.append(list(self.job_metadata.keys())[ijob])
-            # rounds_schedules[future_round_index] = scheduled_job_ids
+
             self.schedules[future_round_index] = scheduled_job_ids
-        # return rounds_schedules
 
     def _solve_gurobi(self, objective, constraints):
         problem = cp.Problem(objective=objective, constraints=constraints)
