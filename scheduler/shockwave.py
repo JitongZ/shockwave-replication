@@ -21,7 +21,7 @@ class ShockwaveScheduler(object):
         self.recompute_flag = False
         self.schedules = OrderedDict()
         self.job_metadata = OrderedDict()
-        self.finish_time_estimates = []
+        self.finish_time_estimates = {}
 
     @property
     def num_jobs(self):
@@ -199,22 +199,23 @@ class ShockwaveScheduler(object):
 
         return log_utilities, job_utility_constrs
 
-    def _compute_interpolated_finish_time(self, alpha=0.9):
+    def _compute_interpolated_finish_time(self, job_id, alpha=0.9):
         """
         Compute a running average on job finish time.
 
         Returns:
         - float, interpolated job finish time
         """
-        round_ids = [id for id, _ in self.finish_time_estimates]
+        finish_time_estimates = self.finish_time_estimates[job_id]
+        round_ids = [id for id, _ in finish_time_estimates]
         windows = np.diff(round_ids)
         weights = np.array([1]) if np.sum(windows) == 0 else windows / np.sum(windows)
         finish_times = np.array(
-            [ft for _, ft in self.finish_time_estimates[: weights.size]]
+            [ft for _, ft in finish_time_estimates[: weights.size]]
         )
         avg_finish_time = np.dot(weights, finish_times)
         interpolated_finish_time = (
-            alpha * avg_finish_time + (1 - alpha) * self.finish_time_estimates[-1][1]
+            alpha * avg_finish_time + (1 - alpha) * finish_time_estimates[-1][1]
         )
         return interpolated_finish_time
 
@@ -229,7 +230,8 @@ class ShockwaveScheduler(object):
         remaining_times = []
         finish_time_fairnesses = []
         for ijob in range(self.num_jobs):
-            job = list(self.job_metadata.values())[ijob]
+            job_id = list(self.job_metadata.keys())[ijob]
+            job = self.job_metadata[job_id]
             contention_factor = self.num_jobs / self.num_gpus
             round_time = (self.round_index + self.future_rounds) * self.round_duration
             remaining_time = job.compute_remaining_runtime()
@@ -241,9 +243,11 @@ class ShockwaveScheduler(object):
                 sum(job.epoch_durations[: job.completed_epochs])
                 + job.compute_remaining_runtime()
             )
-            self.finish_time_estimates.append((self.round_index, predicted_finish_time))
+            if job_id not in self.finish_time_estimates.keys():
+                    self.finish_time_estimates[job_id] = []
+            self.finish_time_estimates[job_id].append((self.round_index, predicted_finish_time))
             finish_time_fairnesses.append(
-                predicted_job_completion_time / self._compute_interpolated_finish_time()
+                predicted_job_completion_time / self._compute_interpolated_finish_time(job_id)
             )
         return remaining_times, finish_time_fairnesses
 
