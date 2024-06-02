@@ -44,7 +44,7 @@ class ShockwaveScheduler(object):
 
     def create_round_schedule_vars_and_constraints(self):
         """Generate round schedule's variables and constraints
-        Args:
+
         Returns:
         - round_schedule_vars, round_schedule_constrs
         """
@@ -75,33 +75,27 @@ class ShockwaveScheduler(object):
         return round_schedule_constrs
 
     def current_round_schedule(self):
-        print(f"Computing schedule for round {self.round_index}, njobs={self.num_jobs}")
+        print(f"Computing schedule in round {self.round_index} for {self.num_jobs} jobs")
 
         if not self.recompute_flag:
             if len(self.schedules) > 0 and self.round_index in self.schedules.keys():
                 print(f"Using previous round schedule...")
                 return self.schedules[self.round_index]
 
-        # TODO: only update schedule when recompute flag is true
         schedule_vars = self._eisenberg_gale_program()
-        jobs_nworkers = [job.nworkers for job in list(self.job_metadata.values())]
-        # print(f"job_nworkers:{jobs_nworkers}")
-        round_schedule = [schedule_vars[ijob][0].value for ijob in range(self.num_jobs)]
-        round_required_workers = cp.hstack(round_schedule) @ cp.hstack(jobs_nworkers)
 
         self._generate_schedule(schedule_vars)
-
         self.unset_recompute_flag()
+
         # write to self.schedules
         return self.schedules[self.round_index]
 
     def _job_log_utility(self, round_schedule_vars):
         """Compute nash social welfare first order approximation (EQ 7 in the paper)
-        Args:
+
         Returns:
         - planned_runtimes, log_utilities, job_utility_constrs
         """
-        # self.num_jobs
         log_bases = []
         bases_breakpoints = self.shockwave_config["log_approximation_bases"]
         for base in bases_breakpoints:
@@ -224,7 +218,7 @@ class ShockwaveScheduler(object):
         )
         return interpolated_finish_time
 
-    def _compute_finish_times(self, planned_runtimes):
+    def _compute_finish_times(self):
         """
         Estimate the Finish Time Fairness by
         (predicted job completion time / interpolated job finish time).
@@ -237,15 +231,12 @@ class ShockwaveScheduler(object):
         for ijob in range(self.num_jobs):
             job = list(self.job_metadata.values())[ijob]
             contention_factor = self.num_jobs / self.num_gpus
-            planned_time = planned_runtimes[ijob]
             round_time = (self.round_index + self.future_rounds) * self.round_duration
-            # remaining_time = cp.max(cp.hstack([job.compute_remaining_runtime() - planned_time, 0]))
             remaining_time = job.compute_remaining_runtime()
             remaining_times.append(remaining_time)
             predicted_job_completion_time = (
                 round_time + remaining_time * contention_factor
             )
-            # TODO: job.submit_time?
             predicted_finish_time = (
                 sum(job.epoch_durations[: job.completed_epochs])
                 + job.compute_remaining_runtime()
@@ -321,9 +312,7 @@ class ShockwaveScheduler(object):
         )
         constraints += job_utility_constrs
         # compute remaining run times (R in EQ 10) and FTFs (EQ 9)
-        remaining_times, finish_time_fairnesses = self._compute_finish_times(
-            planned_runtimes
-        )
+        remaining_times, finish_time_fairnesses = self._compute_finish_times()
         # compute makespan (EQ 10)
         makespan = cp.max(cp.hstack(remaining_times))
         prioritized_log_utilities = []

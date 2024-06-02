@@ -331,10 +331,9 @@ class Scheduler:
         self._max_rounds = max_rounds
         # Number of completed rounds.
         self._num_completed_rounds = 0
-        # Shockwave: for each job, indicate if there is a pending resource requirement update request
+        # Shockwave: for each job, indicate if there is a bs update request
         self._bs_scale = {}
         # Shockwave: maintains the mapping of job id - original batch size
-        # key: job_id, value: int
         self._original_bs = {}
         # Shockwave: record total number of jobs in trace
         self._num_jobs_in_trace = 0
@@ -346,7 +345,7 @@ class Scheduler:
             self._shockwave = ShockwaveScheduler(shockwave_config)
         else:
             self._shockwave = None
-        # Shockwave: scheduled jobs in the same round
+        # Shockwave: scheduled jobs in the current round
         self._current_round_scheduled_jobs = None
 
         port = SCHEDULER_PORT
@@ -441,7 +440,7 @@ class Scheduler:
                     0
                     if all_execution_times[i] <= 0
                     else all_num_steps[i] / all_execution_times[i]
-                )
+                ) # steps per second
                 bs = self._jobs[job_id].batch_size
                 if id in self._shockwave.job_metadata:
                     self._shockwave.job_metadata[id].update_throughput_schedule(
@@ -603,7 +602,9 @@ class Scheduler:
             # Shockwave: initialize shockwave job metadata
             if self._policy.name == "Shockwave":
                 metadata = ShockwaveJobMetadata(
-                    self._profiles[job_id.integer_job_id()], self._time_per_iteration, job.scale_factor
+                    self._profiles[job_id.integer_job_id()],
+                    self._time_per_iteration,
+                    job.scale_factor
                 )
                 metadata.submit(self.get_current_timestamp())
                 self._shockwave.add_metadata(job_id, metadata)
@@ -833,11 +834,6 @@ class Scheduler:
                         num_active_jobs=len(self._jobs),
                     )
                 )
-                self._logger.warn(
-                    "List of active jobs: {active_jobs}".format(
-                        active_jobs=self._jobs.keys(),
-                    )
-                )
 
     def _assign_workers_to_job(
         self, job_id, scale_factor, worker_type, worker_state, worker_assignments
@@ -857,7 +853,6 @@ class Scheduler:
             server_id_ptr: The server to assign workers from.
           worker_assignments: A map from job_id to assigned worker_ids tuple.
         """
-        print(locals())
         worker_ids = worker_state["worker_ids"]
         assigned_worker_ids = worker_state["assigned_worker_ids"]
         server_id_ptr = worker_state["server_id_ptr"]
@@ -994,10 +989,17 @@ class Scheduler:
         return scheduled_jobs
 
     def _shockwave_schedule_helper(self):
+        """
+        Retrieve the current round of scheduled jobs from the
+        shockwave instance.
+
+        Returns:
+        - dict: A dictionary with the worker type as the key and a list of tuples,
+          where each tuple contains a job ID and its scale factor.
+        """
         worker_type = "v100"
         scheduled_jobs = {}
         scheduled_jobs[worker_type] = []
-        # self._shockwave.set_recompute_flag()
         self._current_round_scheduled_jobs = self._shockwave.current_round_schedule()
         assert (
             self._current_round_scheduled_jobs is not None
@@ -1007,7 +1009,7 @@ class Scheduler:
                 scale_factor = self._jobs[job_id].scale_factor
                 scheduled_jobs[worker_type].append((job_id, scale_factor))
 
-        self._logger.info(f"scheduled_jobs: {scheduled_jobs}")
+        self._logger.info(f"Scheduled jobs: {scheduled_jobs}")
 
         return scheduled_jobs
 
@@ -1298,7 +1300,11 @@ class Scheduler:
             -math.log(1.0 - self._interarrival_time_generator.random()) / rate_parameter
         )
 
-    # Simulate batch size scaling
+
+    """
+    Simulate GNS and Accordian batch size scaling
+    """
+
     def _simulate_gns(self, job_id):
         with self._scheduler_lock:
             model = self._jobs[job_id].model
@@ -1321,7 +1327,7 @@ class Scheduler:
             ):
                 if (model, batch_size) not in max_bs_dict.items():
                     self._logger.debug(
-                        f"[Job {job_id}] current epoch: {current_epoch}, doubling batch size in gns"
+                        f"[GNS] [Job {job_id}] current epoch: {current_epoch}, doubling batch size"
                     )
                     self._bs_scale[job_id] = BS_BIG
 
@@ -1330,10 +1336,8 @@ class Scheduler:
     def _simulate_accordion(self, job_id):
         with self._scheduler_lock:
             model = self._jobs[job_id].model
-            job_type = self._jobs[job_id].job_type
             batch_size = self._jobs[job_id].batch_size
             original_batch_size = self._original_bs[job_id]
-            # original_batch_size = self._jobs[job_id].original_bs
             total_steps_run = self._total_steps_run[job_id]
             current_epoch = self._get_num_epochs(model, batch_size, total_steps_run)
 
@@ -1347,13 +1351,13 @@ class Scheduler:
             if batch_size == original_batch_size and not in_critical_regime:
                 if (model, batch_size) not in max_bs_dict.items():
                     self._logger.debug(
-                        f"[Job {job_id}] current epoch: {current_epoch}, scaling up batch size"
+                        f"[Accordian] [Job {job_id}] current epoch: {current_epoch}, scaling up batch size"
                     )
                     self._bs_scale[job_id] = BS_BIG
             elif batch_size != original_batch_size and in_critical_regime:
                 if (model, batch_size) not in min_bs_dict.items():
                     self._logger.debug(
-                        f"[Job {job_id}] current epoch: {current_epoch}, scaling down batch size"
+                        f"[Accordian] [Job {job_id}] current epoch: {current_epoch}, scaling down batch size"
                     )
                     self._bs_scale[job_id] = BS_SMALL
             self._scheduler_cv.notifyAll()
@@ -1586,12 +1590,14 @@ class Scheduler:
                 else:
                     break
 
+            # Batch size scaling
             for single_job_id in self._jobs.keys():
                 if self._jobs[single_job_id].mode == "accordion":
                     self._simulate_accordion(single_job_id)
                 elif self._jobs[single_job_id].mode == "gns":
                     self._simulate_gns(single_job_id)
 
+            # Update information for shockwave
             if self._policy.name == "Shockwave" and self._num_completed_rounds >= 1:
                 self._shockwave_scheduler_update()
 
@@ -3455,14 +3461,15 @@ class Scheduler:
             else:
                 job_ids = [job_id[0], job_id[1]]
 
-            # accordion/gns: scale the batch size and num of iterations for current job(s)
+            # Scale the batch size and num of iterations for current job(s)
             for jobid in job_ids:
                 self._scale_bs_and_iters(jobid)
+                self._bs_scale[job_id] = None
 
             for single_job_id in to_remove:
                 self._remove_job(single_job_id)
                 if self._policy.name == "Shockwave":
-                    print(f"Delete metadata {single_job_id}")
+                    print(f"Deleting shockwave metadata for {single_job_id}")
                     self._shockwave.delete_metadata(single_job_id)
 
             # Schedule the job for re-dispatching if necessary.
@@ -3472,16 +3479,6 @@ class Scheduler:
                     self._next_worker_assignments[job_id]
                 )
 
-            for job_id in job_ids:
-                if job_id is None:
-                    continue
-                if self._bs_scale[job_id] is not None:
-                    # ping the allocation thread to have it re-compute the allocation
-                    # to be used in the next round of scheduling
-                    self._need_to_update_allocation = True
-
-                self._bs_scale[job_id] = None
-
             self._scheduler_cv.notifyAll()
 
     """
@@ -3489,14 +3486,16 @@ class Scheduler:
     """
 
     def _get_num_epochs(self, model, batch_size, num_steps):
-        """Takes in the specifications of a job, calculate and
+        """
+        Takes in the specifications of a job, calculate and
         return the number of total epochs
         """
         dataset_size = dataset_size_dict[model]
         return math.ceil(num_steps / math.ceil(dataset_size / batch_size))
 
     def _get_total_steps(self, model, batch_size, num_epochs):
-        """Takes in the specifications of a job, calculate and
+        """
+        Takes in the specifications of a job, calculate and
         return the number of total steps
         """
         dataset_size = dataset_size_dict[model]
@@ -3599,7 +3598,6 @@ class Scheduler:
                 # job has completely finished
                 if job_id in self._shockwave.job_metadata:
                     self._shockwave.job_metadata[job_id].complete()
-                    # self._shockwave.delete_metadata(job_id)
                 continue
             if job_id not in self._steps_run_so_far.keys():
                 # job hasn't been run
@@ -3616,8 +3614,6 @@ class Scheduler:
                 )
                 assert job_id in self._shockwave.job_metadata.keys()
                 self._shockwave.job_metadata[job_id].complete(current_epoch)
-                # if current_epoch == self._shockwave.job_metadata[job_id].total_epochs:
-                #     self._shockwave.delete_metadata(job_id)
 
         self._shockwave.increment_round()
 
@@ -3626,9 +3622,10 @@ class Scheduler:
     """
 
     def get_finish_time_fairness(self):
-        """Computes the finish time fairness for each job
-        Args:
-        Returns;
+        """
+        Computes the finish time fairness for each job
+
+        Returns:
             finish_time_fairness_list: A list of finish time fairness
             for all jobs in job_ids
         """
