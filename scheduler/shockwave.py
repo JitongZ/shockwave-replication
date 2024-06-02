@@ -133,66 +133,88 @@ class ShockwaveScheduler(object):
                 job.completed_epochs + planned_epochs
             ) / job.total_epochs
 
-            # ###
-            # # the following is a trick to optimize for non-linear item (e.g. log function)
-            # # Ref: Inspired by the author's reply.
-            # # Create binary variables for each segment
-            # segment_pointer = cp.Variable(len(bases_breakpoints) - 1, boolean=True)
-            # # There should be only one segment
-            # breakpoints = np.array(bases_breakpoints)
-            # log_bases_array = np.array(log_bases)
-            # approx_constraints = [
-            #     cp.sum(segment_pointer) == 1,
-            #     objective_epochs_normalized <= breakpoints[:-1] @ segment_pointer,
-            #     objective_epochs_normalized >= breakpoints[1:] @ segment_pointer,
-            # ]
+            
+            # the following is a trick to optimize for non-linear item (e.g. log function)
+            # Ref: Inspired by the author's reply.
 
-            # log_var_approx = (
-            #     log_bases_array[:-1] @ segment_pointer
-            #     + (log_bases_array[1:] - log_bases_array[:-1])
-            #     / (breakpoints[1:] - breakpoints[:-1])
-            #     * ((objective_epochs_normalized - breakpoints[:-1])
-            #     @ segment_pointer)
+            ### Approach 1: Using transformation matrix to constrain boundaries
+            # num_bases = len(bases_breakpoints)
+            # num_segments = num_bases - 1
+            # # Create binary variables for each segment
+            # segment_pointer = cp.Variable(num_segments, boolean=True)
+            # job_utility_constrs += [cp.sum(segment_pointer) == 1.0]
+            # A = np.zeros((num_bases, num_segments))
+            # for i in range(num_segments):
+            #     A[i, i] = 1
+            #     A[i+1, i] = 1
+            # boundaries = A @ segment_pointer
+            # boundary_weights = cp.Variable(num_bases, nonneg=True)
+            # job_utility_constrs += [cp.sum(boundary_weights) == 1.0]
+            # job_utility_constrs += [boundary_weights <= boundaries for i in range(num_bases)]
+            # job_utility_constrs += [
+            #     cp.sum(cp.multiply(boundary_weights, np.array(bases_breakpoints))) == objective_epochs_normalized
+            # ]
+            # log_var_approx = cp.sum(cp.multiply(boundary_weights, log_bases))
+            # log_utilities.append(log_var_approx)
+            ###
+
+            ### Approach 2: Add aux constraints for boundaries
+            num_bases = len(bases_breakpoints)
+            boundaries = cp.Variable(num_bases, boolean=True)
+            job_utility_constrs.append(cp.sum(boundaries) == 2.0)
+            adjacent = cp.Variable(num_bases - 1, boolean=True)
+            # Add constraints to define adjacency
+            for i in range(num_bases - 1):
+                job_utility_constrs.append(adjacent[i] >= boundaries[i] + boundaries[i + 1] - 1)
+                job_utility_constrs.append(adjacent[i] <= boundaries[i])
+                job_utility_constrs.append(adjacent[i] <= boundaries[i + 1])
+            # Add a constraint to ensure exactly one pair of adjacent `True` values
+            job_utility_constrs.append(cp.sum(adjacent) == 1)
+            boundary_weights = cp.Variable(num_bases, nonneg=True)
+            job_utility_constrs += [cp.sum(boundary_weights) == 1.0]
+            # job_utility_constrs += [cp.sum(cp.multiply(boundary_weights, boundaries)) == 1.0]
+            job_utility_constrs += [boundary_weights <= boundaries for i in range(num_bases)]
+            job_utility_constrs += [
+                cp.sum(cp.multiply(boundary_weights, np.array(bases_breakpoints))) == objective_epochs_normalized
+            ]
+            log_var_approx = cp.sum(cp.multiply(boundary_weights, log_bases))
+            log_utilities.append(log_var_approx)
+            ###
+
+            ### following adapted code from shockwave for comparing performance
+            # vars_cursor = [
+            #     cp.Variable(nonneg=True) for _ in range(len(bases_breakpoints))
+            # ]
+            # var_log_progress_normalized = cp.sum(
+            #     cp.multiply(cp.hstack((vars_cursor)), np.array(log_bases))
             # )
 
-            # log_utilities.append(log_var_approx)
-            # job_utility_constrs += approx_constraints
-            # ###
+            # cursor_consts = []
+            # cursor_consts += [
+            #     cp.sum(cp.multiply(cp.hstack(vars_cursor), np.array(bases_breakpoints)))
+            #     == objective_epochs_normalized
+            # ]
+            # cursor_consts += [cp.sum(cp.hstack(vars_cursor)) == 1.0]
+            # vars_boundary = [
+            #     cp.Variable(boolean=True) for _ in range(len(bases_breakpoints))
+            # ]
 
-            ### TODO: following adapted code for debug
-            vars_cursor = [
-                cp.Variable(nonneg=True) for _ in range(len(bases_breakpoints))
-            ]
-            var_log_progress_normalized = cp.sum(
-                cp.multiply(cp.hstack((vars_cursor)), np.array(log_bases))
-            )
+            # boundary_consts = []
+            # boundary_consts += [cp.sum(cp.hstack(vars_boundary)) <= 2]
 
-            cursor_consts = []
-            cursor_consts += [
-                cp.sum(cp.multiply(cp.hstack(vars_cursor), np.array(bases_breakpoints)))
-                == objective_epochs_normalized
-            ]
-            cursor_consts += [cp.sum(cp.hstack(vars_cursor)) == 1.0]
-            vars_boundary = [
-                cp.Variable(boolean=True) for _ in range(len(bases_breakpoints))
-            ]
+            # for varcursor, varboundary in zip(vars_cursor, vars_boundary):
+            #     boundary_consts += [varcursor <= varboundary]
 
-            boundary_consts = []
-            boundary_consts += [cp.sum(cp.hstack(vars_boundary)) <= 2]
+            # if len(vars_boundary) > 2:
+            #     for lboundary in range(0, len(vars_boundary) - 2):
+            #         for rboundary in range(lboundary + 2, len(vars_boundary)):
+            #             boundary_consts += [
+            #                 vars_boundary[lboundary] + vars_boundary[rboundary] <= 1.0
+            #             ]
 
-            for varcursor, varboundary in zip(vars_cursor, vars_boundary):
-                boundary_consts += [varcursor <= varboundary]
-
-            if len(vars_boundary) > 2:
-                for lboundary in range(0, len(vars_boundary) - 2):
-                    for rboundary in range(lboundary + 2, len(vars_boundary)):
-                        boundary_consts += [
-                            vars_boundary[lboundary] + vars_boundary[rboundary] <= 1.0
-                        ]
-
-            log_utilities.append(var_log_progress_normalized)
-            job_utility_constrs += cursor_consts
-            job_utility_constrs += boundary_consts
+            # log_utilities.append(var_log_progress_normalized)
+            # job_utility_constrs += cursor_consts
+            # job_utility_constrs += boundary_consts
             ###
 
         job_utility_constrs += planned_epochs_constrs
