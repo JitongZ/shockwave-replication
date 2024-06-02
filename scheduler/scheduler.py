@@ -3587,6 +3587,9 @@ class Scheduler:
 
             # reset the flags
             self._bs_scale[job_id] = None
+            if self._policy.name == "Shockwave":
+                self._shockwave.set_recompute_flag()
+
 
     """
     Shockwave: Update scheduler fields

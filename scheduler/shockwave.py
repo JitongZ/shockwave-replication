@@ -306,8 +306,6 @@ class ShockwaveScheduler(object):
         consts += self.create_round_schedule_constraints(prioritized_schedule_vars)
 
         # Objective: minimize scheduled round index for more unfair jobs
-        # Ref: The exact logic of this optimization is not specified in the paper's
-        #      Appendix G.2. The following objective is inspired by the Shockwave codebase.
         objective_per_job = []
         for ijob in range(self.num_jobs):
             priority = priorities[ijob]

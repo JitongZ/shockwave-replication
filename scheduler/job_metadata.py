@@ -192,19 +192,11 @@ class ShockwaveJobMetadata:
         for bs in completed_bs_schedule:
             dirichlet_rebased[bs] = max(0, dirichlet_rebased[bs] - 1)
 
-        # Scale down dirichlet_rebased so that total remaining epochs stay the same
-        remaining_epochs = self.total_epochs - self.completed_epochs
-        normalizer = min(
-            1, remaining_epochs / int(sum(list(dirichlet_rebased.values())) + 1)
-        )
-
         # Compute the remaining runtime based on average epoch durations
         bs_to_epoch_duration_map = self.compute_bs_epoch_duration()
         remaining_runtime = 0.0
         for bs in dirichlet_rebased.keys():
             bs_remaining_epochs = dirichlet_rebased[bs]
             remaining_runtime += bs_remaining_epochs * bs_to_epoch_duration_map[bs]
-
-        remaining_runtime *= normalizer
 
         return remaining_runtime
