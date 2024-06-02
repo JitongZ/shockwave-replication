@@ -197,7 +197,7 @@ class ShockwaveScheduler(object):
 
         job_utility_constrs += planned_epochs_constrs
 
-        return log_utilities, job_utility_constrs
+        return log_utilities, job_utility_constrs, planned_runtimes
 
     def _compute_interpolated_finish_time(self, job_id, alpha=0.9):
         """
@@ -219,7 +219,7 @@ class ShockwaveScheduler(object):
         )
         return interpolated_finish_time
 
-    def _compute_finish_times(self):
+    def _compute_finish_times(self, planned_runtimes):
         """
         Estimate the Finish Time Fairness by
         (predicted job completion time / interpolated job finish time).
@@ -228,12 +228,17 @@ class ShockwaveScheduler(object):
         - list of float, finish time fairness estimate for each job
         """
         remaining_times = []
+        makespans = []
         finish_time_fairnesses = []
         for ijob in range(self.num_jobs):
             job_id = list(self.job_metadata.keys())[ijob]
             job = self.job_metadata[job_id]
             contention_factor = self.num_jobs / self.num_gpus
             round_time = (self.round_index + self.future_rounds) * self.round_duration
+            makespan = cp.maximum(
+                0, job.compute_remaining_runtime() - planned_runtimes[ijob]
+            )
+            makespans.append(makespan)
             remaining_time = job.compute_remaining_runtime()
             remaining_times.append(remaining_time)
             predicted_job_completion_time = (
@@ -249,7 +254,7 @@ class ShockwaveScheduler(object):
             finish_time_fairnesses.append(
                 predicted_job_completion_time / self._compute_interpolated_finish_time(job_id)
             )
-        return remaining_times, finish_time_fairnesses
+        return makespans, finish_time_fairnesses
 
     def _prioritize_unfair_jobs(self, schedule_vars, priorities):
         """
@@ -328,14 +333,14 @@ class ShockwaveScheduler(object):
         )
         constraints += round_schedule_constrs
         # compute utility related variables and constraints
-        log_utilities, job_utility_constrs = self._job_log_utility(
+        log_utilities, job_utility_constrs, planned_runtimes = self._job_log_utility(
             round_schedule_vars
         )
         constraints += job_utility_constrs
         # compute remaining run times (R in EQ 10) and FTFs (EQ 9)
-        remaining_times, finish_time_fairnesses = self._compute_finish_times()
+        makespans, finish_time_fairnesses = self._compute_finish_times(planned_runtimes)
         # compute makespan (EQ 10)
-        makespan = cp.max(cp.hstack(remaining_times))
+        makespan = cp.max(cp.hstack(makespans))
         prioritized_log_utilities = []
         priorities = []
         # compute left item of EQ 11
