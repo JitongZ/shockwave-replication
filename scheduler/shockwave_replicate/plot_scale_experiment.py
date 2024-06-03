@@ -32,8 +32,8 @@ def load_data(pickle_dir, metrics_to_plot):
 
 
 def plot_data(data, metrics_to_plot, save_dir, metrics_names):
-    num_gpus_list = sorted(data.keys())
-    policies = sorted(set(policy for gpu in data.values() for policy in gpu.keys()))
+    num_gpus_list = sorted(data.keys(), reverse=True)
+    policies = sorted(set(policy for gpu in data.values() for policy in gpu.keys()), reverse=True)
     colors = ["black", "grey", "red"]  # Ensure you have enough colors for all policies
 
     # Set up the figure and axes for the subplots
