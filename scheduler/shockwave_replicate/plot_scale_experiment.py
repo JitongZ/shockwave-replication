@@ -2,6 +2,7 @@ import pickle
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -31,7 +32,7 @@ def load_data(pickle_dir, metrics_to_plot):
     return data
 
 
-def plot_data(data, metrics_to_plot, save_dir, metrics_names):
+def plot_data(data, metrics_to_plot, save_dir, metrics_names, plot_name):
     num_gpus_list = sorted(data.keys(), reverse=True)
     policies = sorted(set(policy for gpu in data.values() for policy in gpu.keys()), reverse=True)
     colors = ["black", "grey", "red"]  # Ensure you have enough colors for all policies
@@ -88,7 +89,8 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names):
 
     # Add the legend centrally above all subplots
     handles = [plt.Rectangle((0, 0), 1, 1, color=col) for col in colors]
-    labels = policies
+    # labels = policies
+    labels = [policy.replace('max_min_fairness', 'gavel') for policy in policies]
     legend = fig.legend(
         handles,
         labels,
@@ -104,11 +106,17 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names):
     legend.get_frame().set_facecolor("white")
     legend.get_frame().set_boxstyle("round,pad=0.3,rounding_size=0.2")
     plt.tight_layout(rect=[0, 0, 1, 0.9])
-    plt.savefig(os.path.join(save_dir, "gpu_metrics_plots.png"))
+    plt.savefig(os.path.join(save_dir, f"{plot_name}.png"))
 
 
 if __name__ == "__main__":
-    pickle_dir = os.path.join(root_dir, "results/pickle")
+    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser.add_argument('--pickle_dir', type=str, default='results/pickle', help='The directory containing pickle files')
+    parser.add_argument('--plot_name', type=str, default='gpu_metrics_plots', help='The name of the plot directory')
+
+    args = parser.parse_args()
+
+    pickle_dir = os.path.join(root_dir, args.pickle_dir)
     metrics_to_plot = ["makespan", "avg_jct", "worst_ftf", "unfair_fraction"]
     data = load_data(pickle_dir, metrics_to_plot)
     print(data)
@@ -121,4 +129,4 @@ if __name__ == "__main__":
     save_dir = os.path.join(root_dir, "results/plots")
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plot_data(data, metrics_to_plot, save_dir, metrics_names)
+    plot_data(data, metrics_to_plot, save_dir, metrics_names, args.plot_name)
