@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # define paths
-label="temp1"
+label="debug_gavel"
 pickle_dir="results/${label}_pickle"
 
 # create ./results folder if not exist
 mkdir -p ./results
 
 # Array of num_gpus values
-num_gpus_values=("64" "128" "256")
-policies=("max_min_fairness" "shockwave")
 # num_gpus_values=("64" "128" "256")
-# policies=("max_min_fairness")
+# policies=("max_min_fairness" "shockwave")
+num_gpus_values=("64" "128" "256")
+policies=("max_min_fairness")
 
 for num_gpus in "${num_gpus_values[@]}"; do
   for policy_name in "${policies[@]}"; do
