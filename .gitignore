@@ -30,3 +30,6 @@ scheduler/traces/search
 console_output_*.txt
 scheduler/reproduce/test_*.txt
 scheduler/reproduce/pickles/*.pickle
+
+scheduler/shockwave_replicate/results/*pickle*
+scheduler/shockwave_replicate/results/*.txt

@@ -125,29 +125,54 @@ def main(args):
 
     sched.shutdown()
 
-    # dump the simulation statistics into a pickle file for future plotting
+    # # dump the simulation statistics into a pickle file for future plotting
+    # pickle_object = {
+    #     "trace_file": args.trace_file,
+    #     "policy": args.policy,
+    #     "makespan": makespan,
+    #     "avg_jct": avg_jct,
+    #     "jct_list": jct_list,
+    #     "finish_time_fairness_list": finish_time_fairness_list,
+    #     "finish_time_fairness_themis_list": finish_time_fairness_themis_list,
+    #     # finish_time_fairness_isolated_list is added in plotting.py
+    #     "cluster_util": cluster_util,
+    #     "utilization_list": utilization_list,
+    #     "envy_list": envy_list,
+    #     "envy_ratios": envy_ratios,
+    #     "extension_percentage": extension_percentage,
+    #     "num_lease_extensions": num_lease_extensions,
+    #     "num_lease_extension_opportunities": num_lease_extension_opportunities,
+    #     "per_round_schedule": per_round_schedule,
+    #     "time_per_iteration": args.time_per_iteration,
+    #     "throughput_timeline": throughput_timeline,
+    #     "job_run_time": job_run_time,
+    #     "geometric_mean_jct": geometric_mean_jct,
+    #     "harmonic_mean_jct": harmonic_mean_jct,
+    # }
+
+    # if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
+    #     os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
+    # with open(
+    #     os.path.join(
+    #         root_dir,
+    #         args.pickle_output_dir,
+    #         f"{args.policy}_{trace_name}_simulation.pickle",
+    #     ),
+    #     "wb",
+    # ) as f:
+    #     pickle.dump(pickle_object, f)
+
+    num_unfair_jobs = sum(ftf > 1.1 for ftf in finish_time_fairness_list)
+    unfair_fraction = 100 * num_unfair_jobs / len(finish_time_fairness_list)
+    
     pickle_object = {
         "trace_file": args.trace_file,
         "policy": args.policy,
+        "num_gpus": num_gpus[0],
         "makespan": makespan,
         "avg_jct": avg_jct,
-        "jct_list": jct_list,
-        "finish_time_fairness_list": finish_time_fairness_list,
-        "finish_time_fairness_themis_list": finish_time_fairness_themis_list,
-        # finish_time_fairness_isolated_list is added in plotting.py
-        "cluster_util": cluster_util,
-        "utilization_list": utilization_list,
-        "envy_list": envy_list,
-        "envy_ratios": envy_ratios,
-        "extension_percentage": extension_percentage,
-        "num_lease_extensions": num_lease_extensions,
-        "num_lease_extension_opportunities": num_lease_extension_opportunities,
-        "per_round_schedule": per_round_schedule,
-        "time_per_iteration": args.time_per_iteration,
-        "throughput_timeline": throughput_timeline,
-        "job_run_time": job_run_time,
-        "geometric_mean_jct": geometric_mean_jct,
-        "harmonic_mean_jct": harmonic_mean_jct,
+        "worst_ftf": max(finish_time_fairness_list),
+        "unfair_fraction": unfair_fraction,
     }
 
     if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
@@ -156,7 +181,7 @@ def main(args):
         os.path.join(
             root_dir,
             args.pickle_output_dir,
-            f"{args.policy}_{trace_name}_simulation.pickle",
+            f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
         ),
         "wb",
     ) as f:
@@ -242,7 +267,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pickle_output_dir",
         type=str,
-        default="../../pickle_output_nsdi23",
+        default="../../shockwave_replicate/results/pickle",
         help="Path of the directory in which summary files of experiments (*.pickle) are stored",
     )
     # shockwave additions
