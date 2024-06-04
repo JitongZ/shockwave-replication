@@ -6,6 +6,13 @@ import argparse
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
 
+x_axis_limits = {
+    "makespan": 35000,
+    "avg_jct": 9700,
+    "worst_ftf": 4.2,
+    "unfair_fraction": 85,
+}
+
 
 def load_data(pickle_dir, metrics_to_plot):
     data = {}
@@ -86,6 +93,10 @@ def plot_data(data, metrics_to_plot, save_dir, metrics_names, plot_name):
         ax.set_yticklabels(ytick_labels)
         ax.invert_yaxis()  # Invert to have the first entry at the top
         ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.7)
+
+        # Set the x-axis limit if defined for the metric
+        if metric in x_axis_limits:
+            ax.set_xlim([0, x_axis_limits[metric]])
 
     # Add the legend centrally above all subplots
     handles = [plt.Rectangle((0, 0), 1, 1, color=col) for col in colors]
