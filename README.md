@@ -1,22 +1,18 @@
-# Shockwave: Fair and Efficient Cluster Scheduling for Dynamic Adaptation in Machine Learning
+# A Replication of Shockwave
 
 ## Team
 
-- Rachel
-- Jitong
+- Rachel & Jitong
 
 ## Source
 
-Based on the paper "Shockwave: Fair and Efficient Cluster Scheduling for Dynamic Adaptation in Machine Learning"
-Developed on top of [Gavel](https://github.com/stanford-futuredata/gavel)
+Based on [NSDI '23](https://www.usenix.org/conference/nsdi23) paper [Shockwave: Fair and Efficient Cluster Scheduling for Dynamic Adaptation in Machine Learning](https://arxiv.org/abs/2210.00093).
 
-## TL;DR
-
-We implemented the Shockwave scheduler and its policy to achieve a smaller makespan, comparable job completion time, and a smaller unfair job fraction compared to the paper’s baseline when scheduling ML workloads in simulation. However, we were unable to replicate or reproduce the exact results from the paper.
+Developed on top of [Gavel](https://github.com/stanford-futuredata/gavel) which is the open source codebase for [OSDI '20](https://www.usenix.org/conference/osdi20) paper [Heterogeneity-Aware Cluster Scheduling Policies for Deep Learning Workloads](https://www.usenix.org/conference/osdi20/presentation/narayanan-deepak).
 
 ## Github
 
-Project Repository: [Shockwave Replication](#)
+Project Repository: [Shockwave Replication](https://github.com/JitongZ/shockwave-replication)
 
 ## Key Insights from Paper
 
@@ -32,7 +28,7 @@ Shockwave is a scheduler that optimizes both long-term efficiency and long-term 
 
 Replicate the result that Shockwave schedules jobs efficiently and fairly on large clusters of different sizes, focusing on Figure 9 from the paper, which shows improvements in makespan and fairness, and retains comparable job completion time against other schedulers when tested at a large scale.
 
-### Evaluation Results
+### Paper's Results
 
 - Shockwave achieves 1.3-1.34x speedup in makespan.
 - 2.4x better worst-case Finish Time Fairness.
@@ -72,22 +68,27 @@ We started with Gavel’s codebase and focused on implementing three main compon
 - Experiments conducted on Linux machines using CPU resources.
 - Simulation experiments due to resource limitations and feasibility of replication.
 
-## Result and Comparison
+### How to run
+We have tested our implementation on Ubuntu 20.04 and Python 3.9. Python 3.9 can be installed using [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
 
-Comparing our implementation, reproduced scripts, and extracted data from Figure 9 of the paper, we found similar trends in makespan and average job completion time but differences in Fairness Time Factor (FTF) and unfair job fraction. Discrepancies could be due to metric definitions, hyperparameter tuning, trace selection, and implementation details.
+```
+apt-get -y install cmake g++ gcc libnuma-dev make numactl zlib1g-dev
+pip install -r scheduler/requirements.txt
+cd scheduler; make
+```
+In addition to the software dependencies required to run [Gavel](https://github.com/stanford-futuredata/gavel), running Shockwave also requires the [Gurobi Optimizer](https://www.gurobi.com/). An academic license can be requested [here](https://www.gurobi.com/features/academic-named-user-license/). Note that you might need to connect to your university's network or use a VPN to download Gurobi. Please see the Gurobi website for more details. Note that Gurobi needs to be installed with conda:
+```
+conda install -c gurobi gurobi
+```
 
-## Discussion
+To run a sample experiment, you can use our provided script [scheduler/shockwave_replicate/scale_experiments.sh](https://github.com/JitongZ/shockwave-replication/blob/master/scheduler/shockwave_replicate/scale_experiments.sh):
+```
+bash scale_experiments.sh
+```
 
-Potential factors for discrepancies include:
+### Results
+Please refer to our course's [blog post](https://reproducingnetworkresearch.wordpress.com/2024/06/07/cs244-24-shockwave-fair-and-efficient-cluster-scheduling-for-dynamic-adaptation-in-machine-learning/) for the results of our replication.
 
-- **Metric Definition**: Lack of detailed explanations and sample scripts for generating figures.
-- **Hyperparameter Tuning**: Uncertainty about exact hyperparameters used in the paper.
-- **Trace Selection**: Variations in statistics across different traces.
-- **Implementation Details**: Differences in implementation details and approximations needed for DCP compliance.
-
-## Takeaways
-
-This project enhanced our understanding of convex optimization, log approximation techniques, fairness, and efficiency. We learned the importance of detailed reporting and step-by-step guidance in research papers for reproducibility.
 
 ## Acknowledgment
 
