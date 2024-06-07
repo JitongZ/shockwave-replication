@@ -21,7 +21,7 @@ class ShockwaveScheduler(object):
         self.recompute_flag = False
         self.schedules = OrderedDict()
         self.job_metadata = OrderedDict()
-        self.finish_time_estimates = []
+        self.finish_time_estimates = {}
 
     @property
     def num_jobs(self):
@@ -33,7 +33,7 @@ class ShockwaveScheduler(object):
     def delete_metadata(self, job_id):
         return self.job_metadata.pop(job_id, None)
 
-    def _increment_round(self):
+    def increment_round(self):
         self.round_index += 1
 
     def set_recompute_flag(self):
@@ -44,7 +44,7 @@ class ShockwaveScheduler(object):
 
     def create_round_schedule_vars_and_constraints(self):
         """Generate round schedule's variables and constraints
-        Args:
+
         Returns:
         - round_schedule_vars, round_schedule_constrs
         """
@@ -56,37 +56,46 @@ class ShockwaveScheduler(object):
                 [cp.Variable(boolean=True) for _ in range(self.future_rounds)]
             )
         # make sure number of required workers each round smaller than number of GPUs
-        round_schedule_constrs = self.create_round_schedule_constraints()
+        round_schedule_constrs = self.create_round_schedule_constraints(
+            round_schedule_vars
+        )
         return round_schedule_vars, round_schedule_constrs
 
     def create_round_schedule_constraints(self, round_schedule_vars):
         round_schedule_constrs = []
-        jobs_nworkers = [job.nworkers for job in self.job_metadata]
+        jobs_nworkers = [job.nworkers for job in list(self.job_metadata.values())]
         for iround in range(self.future_rounds):
             round_schedule = [
                 round_schedule_vars[ijob][iround] for ijob in range(self.num_jobs)
             ]
-            round_required_workers = cp.vdot(
-                cp.hstack(round_schedule), cp.hstack(jobs_nworkers)
+            round_required_workers = cp.hstack(round_schedule) @ cp.hstack(
+                jobs_nworkers
             )
             round_schedule_constrs.append(round_required_workers <= self.num_gpus)
         return round_schedule_constrs
 
     def current_round_schedule(self):
-        # TODO: only update schedule when recompute flag is true
-        schedule_vars = self.dynamic_eisenberg_gale_scheduling()
+        print(f"Computing schedule in round {self.round_index} for {self.num_jobs} jobs")
+
+        if not self.recompute_flag:
+            if len(self.schedules) > 0 and self.round_index in self.schedules.keys():
+                print(f"Using previous round schedule...")
+                return self.schedules[self.round_index]
+
+        schedule_vars = self._eisenberg_gale_program()
+
         self._generate_schedule(schedule_vars)
+        self.unset_recompute_flag()
 
         # write to self.schedules
         return self.schedules[self.round_index]
 
     def _job_log_utility(self, round_schedule_vars):
         """Compute nash social welfare first order approximation (EQ 7 in the paper)
-        Args:
+
         Returns:
         - planned_runtimes, log_utilities, job_utility_constrs
         """
-        # self.num_jobs
         log_bases = []
         bases_breakpoints = self.shockwave_config["log_approximation_bases"]
         for base in bases_breakpoints:
@@ -100,14 +109,14 @@ class ShockwaveScheduler(object):
         planned_epochs_constrs = []
 
         for ijob in range(self.num_jobs):
-            job = self.job_metadata[ijob]
+            job = list(self.job_metadata.values())[ijob]
             # epoch progress of a job in future_rounds, the right term in EQ(7)
             planned_epochs = cp.Variable(nonneg=True)
 
             job.recompute_epoch_duration()
             # Epoch duration as in the footnote under EQ(7)
             epoch_duration_interpolated = np.mean(
-                job.epoch_duration[: job.completed_epochs + 1]
+                job.epoch_durations[: job.completed_epochs + 1]
             )
 
             planned_runtime = epoch_duration_interpolated * planned_epochs
@@ -124,49 +133,111 @@ class ShockwaveScheduler(object):
                 job.completed_epochs + planned_epochs
             ) / job.total_epochs
 
+            
             # the following is a trick to optimize for non-linear item (e.g. log function)
             # Ref: Inspired by the author's reply.
-            # Create binary variables for each segment
-            segment_pointer = cp.Variable(len(bases_breakpoints) - 1, boolean=True)
-            # There should be only one segment
-            breakpoints = np.array(bases_breakpoints)
-            log_bases_array = np.array(log_bases)
-            approx_constraints = [
-                cp.sum(segment_pointer) == 1,
-                approx_constraints <= breakpoints[:-1] @ segment_pointer,
-                approx_constraints >= breakpoints[1:] @ segment_pointer,
-            ]
 
-            log_var_approx = (
-                log_bases_array[:-1] @ segment_pointer
-                + (log_bases_array[1:] - log_bases_array[:-1])
-                / (breakpoints[1:] - breakpoints[:-1])
-                * (objective_epochs_normalized - breakpoints[:-1])
-                @ segment_pointer
-            )
+            ### Approach 1: Using transformation matrix to constrain boundaries
+            # num_bases = len(bases_breakpoints)
+            # num_segments = num_bases - 1
+            # # Create binary variables for each segment
+            # segment_pointer = cp.Variable(num_segments, boolean=True)
+            # job_utility_constrs += [cp.sum(segment_pointer) == 1.0]
+            # A = np.zeros((num_bases, num_segments))
+            # for i in range(num_segments):
+            #     A[i, i] = 1
+            #     A[i+1, i] = 1
+            # boundaries = A @ segment_pointer
+            # boundary_weights = cp.Variable(num_bases, nonneg=True)
+            # job_utility_constrs += [cp.sum(boundary_weights) == 1.0]
+            # job_utility_constrs += [boundary_weights <= boundaries for i in range(num_bases)]
+            # job_utility_constrs += [
+            #     cp.sum(cp.multiply(boundary_weights, np.array(bases_breakpoints))) == objective_epochs_normalized
+            # ]
+            # log_var_approx = cp.sum(cp.multiply(boundary_weights, log_bases))
+            # log_utilities.append(log_var_approx)
+            ###
+
+            ### Approach 2: Add aux constraints for boundaries
+            num_bases = len(bases_breakpoints)
+            boundaries = cp.Variable(num_bases, boolean=True)
+            job_utility_constrs.append(cp.sum(boundaries) == 2.0)
+            adjacent = cp.Variable(num_bases - 1, boolean=True)
+            # Add constraints to define adjacency
+            for i in range(num_bases - 1):
+                job_utility_constrs.append(adjacent[i] >= boundaries[i] + boundaries[i + 1] - 1)
+                job_utility_constrs.append(adjacent[i] <= boundaries[i])
+                job_utility_constrs.append(adjacent[i] <= boundaries[i + 1])
+            # Add a constraint to ensure exactly one pair of adjacent `True` values
+            job_utility_constrs.append(cp.sum(adjacent) == 1)
+            boundary_weights = cp.Variable(num_bases, nonneg=True)
+            job_utility_constrs += [cp.sum(boundary_weights) == 1.0]
+            # job_utility_constrs += [cp.sum(cp.multiply(boundary_weights, boundaries)) == 1.0]
+            job_utility_constrs += [boundary_weights <= boundaries for i in range(num_bases)]
+            job_utility_constrs += [
+                cp.sum(cp.multiply(boundary_weights, np.array(bases_breakpoints))) == objective_epochs_normalized
+            ]
+            log_var_approx = cp.sum(cp.multiply(boundary_weights, log_bases))
             log_utilities.append(log_var_approx)
-            job_utility_constrs += approx_constraints
+            ###
+
+            ### following adapted code from shockwave for comparing performance
+            # vars_cursor = [
+            #     cp.Variable(nonneg=True) for _ in range(len(bases_breakpoints))
+            # ]
+            # var_log_progress_normalized = cp.sum(
+            #     cp.multiply(cp.hstack((vars_cursor)), np.array(log_bases))
+            # )
+
+            # cursor_consts = []
+            # cursor_consts += [
+            #     cp.sum(cp.multiply(cp.hstack(vars_cursor), np.array(bases_breakpoints)))
+            #     == objective_epochs_normalized
+            # ]
+            # cursor_consts += [cp.sum(cp.hstack(vars_cursor)) == 1.0]
+            # vars_boundary = [
+            #     cp.Variable(boolean=True) for _ in range(len(bases_breakpoints))
+            # ]
+
+            # boundary_consts = []
+            # boundary_consts += [cp.sum(cp.hstack(vars_boundary)) <= 2]
+
+            # for varcursor, varboundary in zip(vars_cursor, vars_boundary):
+            #     boundary_consts += [varcursor <= varboundary]
+
+            # if len(vars_boundary) > 2:
+            #     for lboundary in range(0, len(vars_boundary) - 2):
+            #         for rboundary in range(lboundary + 2, len(vars_boundary)):
+            #             boundary_consts += [
+            #                 vars_boundary[lboundary] + vars_boundary[rboundary] <= 1.0
+            #             ]
+
+            # log_utilities.append(var_log_progress_normalized)
+            # job_utility_constrs += cursor_consts
+            # job_utility_constrs += boundary_consts
+            ###
 
         job_utility_constrs += planned_epochs_constrs
 
-        return planned_runtimes, log_utilities, job_utility_constrs
+        return log_utilities, job_utility_constrs, planned_runtimes
 
-    def _compute_interpolated_finish_time(self, alpha=0.9):
+    def _compute_interpolated_finish_time(self, job_id, alpha=0.9):
         """
         Compute a running average on job finish time.
 
         Returns:
         - float, interpolated job finish time
         """
-        round_ids = [id for id, _ in self.finish_time_estimates]
+        finish_time_estimates = self.finish_time_estimates[job_id]
+        round_ids = [id for id, _ in finish_time_estimates]
         windows = np.diff(round_ids)
-        weights = [1] if np.sum(windows) == 0 else windows / np.sum(windows)
+        weights = np.array([1]) if np.sum(windows) == 0 else windows / np.sum(windows)
         finish_times = np.array(
-            [ft for _, ft in self.finish_time_estimates[: weights.size]]
+            [ft for _, ft in finish_time_estimates[: weights.size]]
         )
         avg_finish_time = np.dot(weights, finish_times)
         interpolated_finish_time = (
-            alpha * avg_finish_time + (1 - alpha) * self.finish_time_estimates[-1][1]
+            alpha * avg_finish_time + (1 - alpha) * finish_time_estimates[-1][1]
         )
         return interpolated_finish_time
 
@@ -179,28 +250,33 @@ class ShockwaveScheduler(object):
         - list of float, finish time fairness estimate for each job
         """
         remaining_times = []
+        makespans = []
         finish_time_fairnesses = []
         for ijob in range(self.num_jobs):
-            job = self.job_metadata[ijob]
+            job_id = list(self.job_metadata.keys())[ijob]
+            job = self.job_metadata[job_id]
             contention_factor = self.num_jobs / self.num_gpus
-            planned_time = planned_runtimes[ijob]
             round_time = (self.round_index + self.future_rounds) * self.round_duration
-            remaining_time = max(job.compute_remaining_runtime() - planned_time, 0)
+            makespan = cp.maximum(
+                0, job.compute_remaining_runtime() - planned_runtimes[ijob]
+            )
+            makespans.append(makespan)
+            remaining_time = job.compute_remaining_runtime()
             remaining_times.append(remaining_time)
             predicted_job_completion_time = (
                 round_time + remaining_time * contention_factor
             )
-            # TODO: subtract job.submit_time from both denominator and numerator
             predicted_finish_time = (
-                job.submit_time
-                + sum(job.epoch_duration[: job.completed_epochs])
+                sum(job.epoch_durations[: job.completed_epochs])
                 + job.compute_remaining_runtime()
             )
-            self.finish_time_estimates.append(self.round_index, predicted_finish_time)
+            if job_id not in self.finish_time_estimates.keys():
+                    self.finish_time_estimates[job_id] = []
+            self.finish_time_estimates[job_id].append((self.round_index, predicted_finish_time))
             finish_time_fairnesses.append(
-                predicted_job_completion_time / self._compute_interpolated_finish_time()
+                predicted_job_completion_time / self._compute_interpolated_finish_time(job_id)
             )
-        return remaining_times, finish_time_fairnesses
+        return makespans, finish_time_fairnesses
 
     def _prioritize_unfair_jobs(self, schedule_vars, priorities):
         """
@@ -214,9 +290,8 @@ class ShockwaveScheduler(object):
                 [cp.Variable(boolean=True) for _ in range(self.future_rounds)]
             )
 
-        job_planned_rounds = (
-            []
-        )  # number of planned rounds in the planning window for each job.
+        # number of planned rounds in the planning window for each job.
+        job_planned_rounds = []
         for i in range(self.num_jobs):
             job_planned_rounds.append(cp.sum(cp.hstack(schedule_vars[i])).value)
 
@@ -228,23 +303,21 @@ class ShockwaveScheduler(object):
             )
 
         # Constraint: in each round, the total nworkers required cannot exceed num_gpus
-        consts += self.create_round_schedule_constraints(schedule_vars)
+        consts += self.create_round_schedule_constraints(prioritized_schedule_vars)
 
         # Objective: minimize scheduled round index for more unfair jobs
-        # Ref: The exact logic of this optimization is not specified in the paper's
-        #      Appendix G.2. The following objective is inspired by the Shockwave codebase.
         objective_per_job = []
         for ijob in range(self.num_jobs):
             priority = priorities[ijob]
             if job_planned_rounds[ijob] > 0:
-                avg_sched_idx = (
-                    cp.vdot(
-                        cp.hstack([t for t in range(self.future_rounds)]),
-                        cp.hstack(prioritized_schedule_vars[ijob]),
-                    )
-                    / job_planned_rounds[ijob]
-                )
-                objective_per_job.append(avg_sched_idx * priority)
+                average_ranking = (
+                    cp.hstack([t for t in range(self.future_rounds)])
+                    @ cp.hstack(prioritized_schedule_vars[ijob])
+                ) / job_planned_rounds[ijob]
+                objective_per_job.append(average_ranking * priority)
+
+        if len(objective_per_job) == 0:
+            return schedule_vars
 
         objective = cp.Minimize(cp.sum(cp.hstack(objective_per_job)))
         problem = self._solve_gurobi(objective, consts)
@@ -255,7 +328,24 @@ class ShockwaveScheduler(object):
         return prioritized_schedule_vars
 
     def _eisenberg_gale_program(self):
-        """ """
+        """
+        Generates and solves the Eisenberg-Gale (EG) program for job scheduling.
+
+        This function constructs the constraints and objective for the EG program, a mathematical
+        model used for fair job scheduling. It performs the following steps:
+
+        1. Creates round's job schedule variables and corresponding constraints.
+        2. Computes utility-related variables and constraints.
+        3. Computes remaining run times and finish time fairnesses (FTFs).
+        4. Computes makespan.
+        5. Computes prioritized log utilities based on job priorities.
+        6. Defines the objective function to maximize prioritized utilities and minimize makespan.
+        7. Solves the optimization problem using Gurobi.
+        8. Prioritizes unfair jobs based on computed priorities.
+
+        Returns:
+        - list, the prioritized round schedule variables.
+        """
         constraints = []
         # create a round's job schedule's cp variables, and corresponding constraints
         round_schedule_vars, round_schedule_constrs = (
@@ -263,16 +353,14 @@ class ShockwaveScheduler(object):
         )
         constraints += round_schedule_constrs
         # compute utility related variables and constraints
-        planned_runtimes, log_utilities, job_utility_constrs = self._job_log_utility(
+        log_utilities, job_utility_constrs, planned_runtimes = self._job_log_utility(
             round_schedule_vars
         )
         constraints += job_utility_constrs
         # compute remaining run times (R in EQ 10) and FTFs (EQ 9)
-        remaining_times, finish_time_fairnesses = self._compute_finish_times(
-            planned_runtimes
-        )
+        makespans, finish_time_fairnesses = self._compute_finish_times(planned_runtimes)
         # compute makespan (EQ 10)
-        makespan = cp.max(cp.hstack(remaining_times))
+        makespan = cp.max(cp.hstack(makespans))
         prioritized_log_utilities = []
         priorities = []
         # compute left item of EQ 11
@@ -293,21 +381,21 @@ class ShockwaveScheduler(object):
         problem = self._solve_gurobi(objective, constraints)
         assert problem.status in cp.settings.SOLUTION_PRESENT
 
-        round_schedule_vars = self._prioritize_unfair_jobs(round_schedule_vars)
+        round_schedule_vars = self._prioritize_unfair_jobs(
+            round_schedule_vars, priorities
+        )
 
         return round_schedule_vars
 
     def _generate_schedule(self, round_schedule_vars):
-        # rounds_schedules = OrderedDict()
-        for iround in self.future_rounds:
+        for iround in range(self.future_rounds):
             scheduled_job_ids = []
             future_round_index = self.round_index + iround
             for ijob in range(self.num_jobs):
                 if bool(round_schedule_vars[ijob][iround].value.item()):
-                    scheduled_job_ids.append(ijob)
-            # rounds_schedules[future_round_index] = scheduled_job_ids
+                    scheduled_job_ids.append(list(self.job_metadata.keys())[ijob])
+
             self.schedules[future_round_index] = scheduled_job_ids
-        # return rounds_schedules
 
     def _solve_gurobi(self, objective, constraints):
         problem = cp.Problem(objective=objective, constraints=constraints)

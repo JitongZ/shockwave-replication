@@ -132,29 +132,29 @@ def main(args):
     ) as f:
         pickle.dump(pickle_object, f)
 
-    # temporary code for testing the plotting, delete the following
-    args.policy = "shockwave"
-    pickle_object = {
-        "trace_file": args.trace_file,
-        "policy": args.policy,
-        "num_gpus": num_gpus[0],
-        "makespan": makespan,
-        "avg_jct": avg_jct,
-        "worst_ftf": max(ftf_list),
-        "unfair_fraction": unfair_job_fraction,
-    }
+    # # temporary code for testing the plotting, delete the following
+    # args.policy = "shockwave"
+    # pickle_object = {
+    #     "trace_file": args.trace_file,
+    #     "policy": args.policy,
+    #     "num_gpus": num_gpus[0],
+    #     "makespan": makespan,
+    #     "avg_jct": avg_jct,
+    #     "worst_ftf": max(ftf_list),
+    #     "unfair_fraction": unfair_job_fraction,
+    # }
 
-    if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
-        os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
-    with open(
-        os.path.join(
-            root_dir,
-            args.pickle_output_dir,
-            f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
-        ),
-        "wb",
-    ) as f:
-        pickle.dump(pickle_object, f)
+    # if not os.path.isdir(os.path.join(root_dir, args.pickle_output_dir)):
+    #     os.mkdir(os.path.join(root_dir, args.pickle_output_dir))
+    # with open(
+    #     os.path.join(
+    #         root_dir,
+    #         args.pickle_output_dir,
+    #         f"{args.policy}_{num_gpus[0]}_{trace_name}_simulation.pickle",
+    #     ),
+    #     "wb",
+    # ) as f:
+    #     pickle.dump(pickle_object, f)
 
 
 if __name__ == "__main__":

@@ -33,14 +33,24 @@
 #   --time_per_iteration 120 \
 #   > ./results/test_shockwave_trace.txt 2>&1
 
+# python3 ../scripts/drivers/simulate_scheduler_with_trace.py \
+#   --trace_file ../traces/shockwave/220_0.2_5_100_25_4_0,0.5,0.5_0.6,0.3,0.09,0.01_multigpu_dynamic.trace \
+#   --policy "shockwave" \
+#   --throughputs_file ../shockwave_wisr_throughputs.json \
+#   --cluster_spec 64:0:0 \
+#   --seed 0 --solver ECOS \
+#   --time_per_iteration 120 \
+#   --pickle_output_dir "../../shockwave_replicate/results/pickle_temp" \
+#   > ./results/test_shockwave_trace_latest 2>&1
+
 python3 ../scripts/drivers/simulate_scheduler_with_trace.py \
   --trace_file ../traces/shockwave/220_0.2_5_100_25_4_0,0.5,0.5_0.6,0.3,0.09,0.01_multigpu_dynamic.trace \
-  --policy "shockwave" \
+  --policy "max_min_fairness" \
   --throughputs_file ../shockwave_wisr_throughputs.json \
   --cluster_spec 64:0:0 \
   --seed 0 --solver ECOS \
   --time_per_iteration 120 \
-  --pickle_output_dir "../../shockwave_replicate/results/pickle_temp"
-  > ./results/test_shockwave_trace_temp.txt 2>&1
+  --pickle_output_dir "../../shockwave_replicate/results/pickle_temp" \
+  > ./results/test_shockwave_trace_latest_gavel 2>&1
 
  

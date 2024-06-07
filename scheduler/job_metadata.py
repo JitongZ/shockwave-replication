@@ -6,7 +6,7 @@ INFINITY = 1e9
 
 
 class ShockwaveJobMetadata:
-    def __init__(self, config: dict, round_duration: int):
+    def __init__(self, config: dict, round_duration: int, scale_factor=None):
         """
         ShockwaveJobMetadata constructor.
 
@@ -25,13 +25,11 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
-        config = config[0]
         self.total_epochs = config["num_epochs"]
         self.completed_epochs = 0
 
         self.nsamples_per_epoch = config["num_samples_per_epoch"]
-        self.nworkers = config["scale_factor"]
-        self.duration = config["duration"]
+        self.nworkers = scale_factor if scale_factor is not None else config["scale_factor"]
 
         self.epoch_batch_sizes = config["bs_every_epoch"]
         self.epoch_mem_reqs = config["mem_every_epoch"]
@@ -74,6 +72,9 @@ class ShockwaveJobMetadata:
         if num_epochs is None:
             self.completed_epochs = self.total_epochs
         else:
+            assert (
+                num_epochs <= self.total_epochs
+            ), f"Incorrect epoch progress {num_epochs}"
             self.completed_epochs = num_epochs
 
     def update_throughput_schedule(self, round_id, throughput, bs):
@@ -98,11 +99,8 @@ class ShockwaveJobMetadata:
         Returns:
         - None
         """
-        assert self.throughput_schedule is not None, "Throughput schedule must be set."
         if len(self.throughput_schedule) <= 0:
             return
-        assert self.epoch_batch_sizes is not None, "Epoch batch sizes must be set."
-        assert self.round_duration is not None, "Round duration must be set."
 
         # Compute the actual number of samples processed (measured_nsamples)
         measured_rounds = sorted(list(self.throughput_schedule.keys()))
@@ -130,23 +128,23 @@ class ShockwaveJobMetadata:
                 estimated_time_range += duration
                 estimated_nsamples += self.nsamples_per_epoch
         # Account for the partially completed epoch
-        time_diff = measured_time_range - estimated_time_range
-        if time_diff > 0:
+        partial_duration = measured_time_range - estimated_time_range
+        if partial_duration > 0:
             epoch_duration = self.epoch_durations[iepoch]
-            estimated_nsamples += self.nsamples_per_epoch * time_diff / epoch_duration
+            estimated_nsamples += self.nsamples_per_epoch * (partial_duration / epoch_duration)
 
         # Adjust epoch durations based on the ratio of estimated to measured samples
         if (
             measured_nsamples <= 0
             or estimated_nsamples <= 0
-            or abs(measured_nsamples - estimated_nsamples) / estimated_nsamples <= 0.4
+            # or abs(measured_nsamples - estimated_nsamples) / estimated_nsamples <= 0.4
         ):
             return
         else:
-            factor = estimated_nsamples / measured_nsamples
+            epoch_duration_rescale_factor = estimated_nsamples / measured_nsamples
             for iepoch in range(len(self.epoch_durations)):
                 self.epoch_durations[iepoch] = (
-                    self.estimated_epoch_durations[iepoch] * factor
+                    self.estimated_epoch_durations[iepoch] * epoch_duration_rescale_factor
                 )
 
     def compute_bs_epoch_duration(self):
@@ -158,17 +156,13 @@ class ShockwaveJobMetadata:
           average duration of epochs with that batch size.
         """
         self.recompute_epoch_duration()
-        bs_epoch_duration_map = {}
+        bs_to_epoch_durations = {}
         for iepoch, duration in enumerate(self.epoch_durations):
             bs = self.epoch_batch_sizes[iepoch]
-            if bs not in bs_epoch_duration_map:
-                bs_epoch_duration_map[bs] = []
-            bs_epoch_duration_map[bs].append(duration)
-        for bs in bs_epoch_duration_map.keys():
-            mean_duration = np.mean(bs_epoch_duration_map[bs])
-            assert mean_duration > 0 and mean_duration < INFINITY
-            bs_epoch_duration_map[bs] = mean_duration
-        return bs_epoch_duration_map
+            if bs not in bs_to_epoch_durations:
+                bs_to_epoch_durations[bs] = []
+            bs_to_epoch_durations[bs].append(duration)
+        return {bs: np.mean(bs_to_epoch_durations[bs]) for bs in bs_to_epoch_durations.keys()}
 
     def compute_remaining_runtime(self):
         """
@@ -182,9 +176,9 @@ class ShockwaveJobMetadata:
             return 1.0
 
         # Update Dirichlet distribution with observed batch sizes
-        observed_bs_schedule = self.epoch_batch_sizes[: self.completed_epochs + 1]
+        completed_bs_schedule = self.epoch_batch_sizes[: self.completed_epochs + 1]
         dirichlet_posterior = copy.deepcopy(self.dirichlet)
-        for bs in observed_bs_schedule:
+        for bs in completed_bs_schedule:
             dirichlet_posterior[bs] += 1
 
         # Rebase Dirichlet distribution to match the total number of epochs
@@ -195,23 +189,14 @@ class ShockwaveJobMetadata:
         }
 
         # Adjust for already completed epochs
-        for bs in observed_bs_schedule:
-            if dirichlet_rebased[bs] >= 1:
-                dirichlet_rebased[bs] -= 1
-
-        # Scale down dirichlet_rebased so that total remaining epochs stay the same
-        remaining_epochs = self.total_epochs - self.completed_epochs
-        normalizer = min(
-            1, remaining_epochs / int(sum(list(dirichlet_rebased.values())) + 1)
-        )
+        for bs in completed_bs_schedule:
+            dirichlet_rebased[bs] = max(0, dirichlet_rebased[bs] - 1)
 
         # Compute the remaining runtime based on average epoch durations
-        bs_epoch_duration_map = self.compute_bs_epoch_duration()
+        bs_to_epoch_duration_map = self.compute_bs_epoch_duration()
         remaining_runtime = 0.0
         for bs in dirichlet_rebased.keys():
             bs_remaining_epochs = dirichlet_rebased[bs]
-            remaining_runtime += bs_remaining_epochs * bs_epoch_duration_map[bs]
-
-        remaining_runtime *= normalizer
+            remaining_runtime += bs_remaining_epochs * bs_to_epoch_duration_map[bs]
 
         return remaining_runtime
